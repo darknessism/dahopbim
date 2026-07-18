@@ -959,6 +959,61 @@ footer{margin-left:288px;padding:44px clamp(20px,4vw,64px);border-top:1px solid 
       </ul>
     </div>
   </div>
+
+  <h3 class="reveal" style="font-size:20px;margin:44px 0 8px"><i class="fa-solid fa-code-fork" style="color:var(--violet);margin-right:8px"></i>Hai con đường bóc tách khối lượng — chọn đường nào?</h3>
+  <p class="reveal d1" style="color:var(--muted);font-size:14.5px;margin-bottom:14px;max-width:900px">Dành cho bạn đọc chưa từng làm BIM: <b style="color:var(--text)">"Bóc tách khối lượng"</b> đơn giản là <b>đo đếm công trình ra thành con số</b> — bao nhiêu m³ bê tông, bao nhiêu m² sơn, bao nhiêu mét ống nước — để nhân với đơn giá mà ra tiền. Vấn đề nằm ở chỗ: <b style="color:var(--text)">đếm theo "luật" nào?</b> Ngành xây dựng Việt Nam có bộ quy tắc gọi là <b style="color:var(--cyan)">quy cách đo bóc</b> (ví dụ: chỗ dầm giao với cột thì khối bê tông phần giao tính cho cột hay cho dầm? lỗ cửa nhỏ trên tường có phải trừ đi không?). Nếu hai bên đếm theo hai luật khác nhau, con số sẽ lệch nhau và sinh tranh cãi khi thanh toán. Từ đó có <b>hai con đường</b> để bóc khối lượng từ mô hình BIM:</p>
+
+  <div class="grid g2">
+    <div class="card ac-cyan reveal">
+      <div class="big-ic"><i class="fa-solid fa-ruler"></i></div>
+      <h3>Con đường 1 — Revit tự bóc → Excel → G8 <span class="tag">Quy trình trong BIM Guide</span></h3>
+      <p>Hình dung: <b>tự đếm bằng thước của chính mình</b>. Revit vốn đã biết kích thước của mọi cấu kiện trong mô hình, nên có thể xuất thẳng bảng thống kê (Schedule) ra khối lượng.</p>
+      <ul>
+        <li><b>Điều kiện tiên quyết:</b> phải "đếm được ngay từ lúc vẽ" — tức là Bước 1–2 của sơ đồ phía trên: mô hình được dựng bằng <b>Family (thư viện cấu kiện) dựng sẵn đã gắn mã công việc</b>, đúng chuẩn ngay từ đầu.</li>
+        <li><b>Ưu điểm:</b> nhanh, không tốn thêm phần mềm trung gian, khối lượng luôn "sống" cùng mô hình — sửa mô hình là số tự cập nhật.</li>
+        <li><b>Nhược điểm:</b> Revit chỉ đo <b>hình học thô</b> (vật thể trong máy to đúng bằng chừng đó thì đo ra chừng đó) — nó <b>không biết quy cách đo bóc Việt Nam</b>. Phần "áp luật đếm" phải tự xử lý bằng kỷ luật dựng hình + khâu tổng hợp Excel trước khi chạy dự toán G8.</li>
+        <li><b>Phù hợp khi:</b> công ty <b>tự dựng mô hình</b> và đã đầu tư bộ Family chuẩn gắn mã riêng (như đơn vị trong BIM Guide).</li>
+      </ul>
+    </div>
+    <div class="card ac-green reveal d1">
+      <div class="big-ic"><i class="fa-solid fa-calculator"></i></div>
+      <h3>Con đường 2 — Revit → Cubicost → Dự toán <span class="tag" style="--ac:#1FA15F">Chuẩn đo bóc VN</span></h3>
+      <p>Hình dung: <b>đưa mô hình cho một "máy đếm chuyên nghiệp" đã cài sẵn luật đếm Việt Nam</b>. Mô hình Revit được chuyển sang phần mềm Cubicost (hãng Glodon) để bóc.</p>
+      <ul>
+        <li><b>Cách hoạt động:</b> xuất mô hình Revit (qua plugin/định dạng trung gian) vào Cubicost → phần mềm <b>tự động áp tiêu chuẩn đo bóc Việt Nam</b>: trừ phần giao cấu kiện theo thứ tự ưu tiên, quy tắc tính ván khuôn, xử lý lỗ mở... → xuất khối lượng "chuẩn thầu" sang phần mềm dự toán.</li>
+        <li><b>Ưu điểm:</b> khối lượng ra đúng quy cách, <b>ít tranh cãi khi đấu thầu, thanh quyết toán</b>; không phụ thuộc mô hình có được dựng chuẩn hay không.</li>
+        <li><b>Nhược điểm:</b> tốn thêm chi phí bản quyền và một bước chuyển đổi mô hình; khối lượng nằm ở phần mềm ngoài, không "sống" trực tiếp trong Revit.</li>
+        <li><b>Phù hợp khi:</b> <b>nhận mô hình từ đơn vị khác</b> (không kiểm soát được cách dựng), hoặc cần khối lượng có tính pháp lý cao để mời thầu.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card ac-gold reveal" style="margin-top:20px">
+    <h3><i class="fa-solid fa-window-maximize" style="color:var(--gold);margin-right:8px"></i>Ví dụ dễ hiểu nhất: bức tường có ô cửa nhỏ</h3>
+    <p>Một bức tường <b>3m × 5m = 15,0 m²</b>, trên tường có một ô cửa gió nhỏ <b>0,4m × 0,5m = 0,2 m²</b>:</p>
+    <ul>
+      <li><b>Revit đo hình học thô:</b> tường thực tế bị khoét lỗ, nên trả về <b>15,0 − 0,2 = 14,8 m²</b>.</li>
+      <li><b>Quy cách đo bóc Việt Nam:</b> lỗ mở có diện tích nhỏ (dưới ngưỡng quy định ~0,25 m²) <b>không phải trừ</b> — vì công xây/trát quanh lỗ nhỏ còn tốn hơn cả phần khoét đi. Kết quả: <b>15,0 m²</b>.</li>
+      <li>Hai con số <b>14,8 vs 15,0</b> — nhân với hàng nghìn bức tường của một chung cư là chênh lệch tiền tỷ. Đây chính là lý do tồn tại Con đường 2: Cubicost tự áp các luật này, còn ở Con đường 1 người làm dự toán phải tự hiệu chỉnh khi tổng hợp Excel.</li>
+    </ul>
+  </div>
+
+  <div class="tbl-wrap reveal d1" style="margin-top:20px">
+    <table>
+      <thead><tr><th>Tiêu chí</th><th>Con đường 1 — Revit → Excel → G8</th><th>Con đường 2 — Revit → Cubicost → Dự toán</th></tr></thead>
+      <tbody>
+        <tr><td><b>Ai "áp luật đếm"?</b></td><td>Con người (dựng hình chuẩn + hiệu chỉnh Excel)</td><td>Phần mềm (tích hợp sẵn tiêu chuẩn đo bóc VN)</td></tr>
+        <tr><td><b>Chi phí thêm</b></td><td>Không (dùng ngay Revit + Excel)</td><td>Bản quyền Cubicost</td></tr>
+        <tr><td><b>Yêu cầu mô hình</b></td><td>Rất cao — Family gắn mã từ đầu</td><td>Linh hoạt — nhận cả mô hình bên ngoài</td></tr>
+        <tr><td><b>Tốc độ cập nhật</b></td><td>Tức thì (sửa mô hình → số tự đổi)</td><td>Phải chuyển đổi lại mô hình khi có thay đổi</td></tr>
+        <tr><td><b>Tính pháp lý khối lượng</b></td><td>Phụ thuộc kỷ luật nội bộ</td><td>Cao — đúng quy cách đo bóc, chuẩn hồ sơ thầu</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card ac-cyan reveal d2" style="margin-top:20px">
+    <p><i class="fa-solid fa-lightbulb" style="color:var(--cyan);margin-right:8px"></i><b>Tóm lại:</b> hai con đường không loại trừ nhau. Đơn vị trong BIM Guide chọn <b>Con đường 1</b> vì họ đã đầu tư bộ Family CSDL gắn mã (nên bỏ qua được phần mềm trung gian); nhiều Tổng thầu và tư vấn QS tại Việt Nam chọn <b>Con đường 2</b> để có khối lượng chuẩn đo bóc ngay mà không phụ thuộc chất lượng mô hình đầu vào. Doanh nghiệp trưởng thành về BIM thường dùng <b>cả hai</b>: Revit tự bóc để kiểm soát nhanh trong quá trình thiết kế, Cubicost để chốt khối lượng pháp lý khi mời thầu.</p>
+  </div>
 </section>
 
 <div class="divider"></div>
