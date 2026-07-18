@@ -258,6 +258,7 @@ footer{margin-left:288px;padding:44px clamp(20px,4vw,64px);border-top:1px solid 
   <a class="nav-link" href="#vai-tro"><i class="fa-solid fa-gears"></i>Vai trò trong thiết kế</a>
   <a class="nav-link" href="#dimensions"><i class="fa-solid fa-layer-group"></i>Các chiều 3D → 7D</a>
   <a class="nav-link" href="#lod-dim"><i class="fa-solid fa-stairs"></i>LOD × Chiều BIM</a>
+  <a class="nav-link" href="#he-sinh-thai"><i class="fa-solid fa-shapes"></i>Hệ sinh thái phần mềm</a>
   <a class="nav-link featured" href="#chu-dau-tu"><i class="fa-solid fa-user-tie"></i>Chủ Đầu Tư làm gì</a>
   <a class="nav-link featured" href="#data-ownership"><i class="fa-solid fa-chess-king"></i>Quản lý dự án hiện đại</a>
   <div class="nav-sep">Triển khai</div>
@@ -273,7 +274,6 @@ footer{margin-left:288px;padding:44px clamp(20px,4vw,64px);border-top:1px solid 
   <div class="nav-sep">Dữ liệu &amp; BI</div>
   <a class="nav-link" href="#pipeline"><i class="fa-solid fa-database"></i>BIM → MySQL → Power BI</a>
   <a class="nav-link" href="#phan-biet"><i class="fa-solid fa-code-compare"></i>Revit · IFC · Navisworks</a>
-  <a class="nav-link" href="#he-sinh-thai"><i class="fa-solid fa-shapes"></i>Hệ sinh thái phần mềm</a>
   <a class="nav-link" href="#automation"><i class="fa-solid fa-robot"></i>Tự động hóa CDE → MySQL</a>
   <div class="nav-sep">Chiến lược sản phẩm</div>
   <a class="nav-link" href="#manh-ghep"><i class="fa-solid fa-puzzle-piece"></i>4 Mảnh ghép chiến lược</a>
@@ -495,6 +495,133 @@ footer{margin-left:288px;padding:44px clamp(20px,4vw,64px);border-top:1px solid 
 
   <div class="card ac-cyan reveal d2" style="margin-top:20px">
     <p><i class="fa-solid fa-lightbulb" style="color:var(--cyan);margin-right:8px"></i><b>Tóm lại:</b> trong quy trình thiết kế và quản trị dự án, các <b>Chiều BIM (Dimensions)</b> chính là các <b style="color:var(--gold)">Yêu cầu Nghiệp vụ (Business Requirements)</b>, và để đáp ứng được các yêu cầu đó, nền tảng cơ sở dữ liệu (Mô hình 3D) bắt buộc phải đạt được một <b style="color:var(--cyan)">"độ chín" LOD tương ứng</b>.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ 8B. HỆ SINH THÁI PHẦN MỀM BIM ============ -->
+<section id="he-sinh-thai">
+  <span class="kicker reveal"><span class="dot"></span> Phần 03+ · Software Ecosystem</span>
+  <h2 class="sec-title reveal">Hệ sinh thái phần mềm BIM <span class="grad">toàn diện &amp; tiên tiến nhất</span></h2>
+  <p class="sec-sub reveal d1">Báo cáo phân tích <b style="color:var(--text)">công cụ, người dùng và luồng tương tác dữ liệu</b> trong vòng đời dự án xây dựng — 7 nhóm phần mềm ứng với từng mắt xích của quy trình BIM.</p>
+
+  <h3 class="reveal" style="font-size:20px;margin-bottom:8px"><i class="fa-solid fa-pen-ruler" style="color:var(--cyan);margin-right:8px"></i>1 · Nhóm Tạo lập mô hình 3D (BIM Authoring Tools)</h3>
+  <p class="reveal d1" style="color:var(--muted);font-size:14.5px;margin-bottom:20px">Đây là nơi dữ liệu bắt đầu được sinh ra. Các phần mềm này không dùng để "vẽ" mà là để <b style="color:var(--text)">"xây dựng công trình trong môi trường ảo"</b>.</p>
+  <div class="grid g3">
+    <div class="card ac-cyan reveal">
+      <div class="big-ic"><i class="fa-solid fa-compass-drafting"></i></div>
+      <h3>1.1 · Kiến trúc (Architecture)</h3>
+      <div style="margin-bottom:10px"><span class="tag">Autodesk Revit</span><span class="tag">Graphisoft Archicad</span><span class="tag">Rhino + Grasshopper — Parametric</span></div>
+      <ul>
+        <li><b>Người dùng:</b> Kiến trúc sư (Architect), Họa viên BIM (BIM Modeler).</li>
+        <li><b>Vai trò &amp; kết nối:</b> dựng khối, không gian, vỏ bao che. Dữ liệu xuất ra định dạng gốc (<b>.rvt</b>) hoặc file mở <b>.ifc</b> gửi cho Kết cấu và Cơ điện làm hệ quy chiếu.</li>
+      </ul>
+    </div>
+    <div class="card ac-violet reveal d1">
+      <div class="big-ic"><i class="fa-solid fa-cubes"></i></div>
+      <h3>1.2 · Kết cấu (Structure)</h3>
+      <div style="margin-bottom:10px"><span class="tag">Tekla Structures — "vua" thép &amp; đúc sẵn LOD 400</span><span class="tag">Revit Structure — BTCT toàn khối</span></div>
+      <ul>
+        <li><b>Người dùng:</b> Kỹ sư Kết cấu (Structural Engineer), Kỹ sư Detailer (vẽ chi tiết xưởng).</li>
+        <li><b>Vai trò &amp; kết nối:</b> nhận file Kiến trúc làm nền, dựng cột, dầm, sàn, bố trí thép, liên kết bu-lông. Xuất dữ liệu thẳng ra <b>máy CNC</b> tại nhà máy sản xuất (file <b>.nc</b>).</li>
+      </ul>
+    </div>
+    <div class="card ac-orange reveal d2">
+      <div class="big-ic"><i class="fa-solid fa-fan"></i></div>
+      <h3>1.3 · Cơ Điện Nước (MEP)</h3>
+      <div style="margin-bottom:10px"><span class="tag">Autodesk Revit MEP</span><span class="tag">Plugin MagiCAD — thủy lực, thông gió</span></div>
+      <ul>
+        <li><b>Người dùng:</b> Kỹ sư MEP, Kỹ sư PCCC.</li>
+        <li><b>Vai trò &amp; kết nối:</b> nhận file Kiến trúc + Kết cấu làm nền; thiết kế đường ống <b>tránh đâm vào dầm, cột</b> ngay từ khâu thiết kế.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:30px">
+    <div class="card ac-red reveal">
+      <div class="big-ic"><i class="fa-solid fa-object-group"></i></div>
+      <h3>2 · Phối hợp &amp; Kiểm tra xung đột (BIM Coordination)</h3>
+      <p>Khi các bộ môn làm xong, họ ghép lại với nhau. Nhóm này không dùng để vẽ mà để <b>"đọc, kiểm tra và tìm lỗi"</b>.</p>
+      <ul>
+        <li><b>Navisworks Manage:</b> phổ biến nhất — ghép file cực nhẹ, chạy Clash Detection.</li>
+        <li><b>Solibri Office:</b> tiên tiến nhất về <b>kiểm tra theo quy tắc</b> (Rule-based checking) — tự quét cửa chống cháy có đủ rộng không, bậc thang nào sai quy chuẩn.</li>
+        <li><b>Revizto / BIMcollab:</b> nền tảng <b>theo dõi lỗi</b> (Issue Tracker) — như một mạng xã hội thu nhỏ cho mô hình 3D.</li>
+        <li><b>Người dùng:</b> BIM Coordinator, Design Manager. <b>Luồng:</b> nhận <b>.nwc / .ifc</b> từ Revit/Tekla; tìm thấy lỗi → sinh file <b>.bcf</b> gửi thẳng về Revit của kỹ sư kèm vị trí cần sửa.</li>
+      </ul>
+    </div>
+    <div class="card ac-blue reveal d1">
+      <div class="big-ic"><i class="fa-solid fa-hourglass-half"></i></div>
+      <h3>3 · Quản lý tiến độ thi công (4D BIM)</h3>
+      <p>Gắn không gian 3D với trục thời gian để mô phỏng tòa nhà "mọc lên" như thế nào.</p>
+      <ul>
+        <li><b>Synchro 4D (Bentley):</b> công cụ mạnh nhất hiện nay, vượt trội hơn Navisworks Simulate.</li>
+        <li><b>Người dùng:</b> Kỹ sư Lập kế hoạch (Planning Engineer), Giám đốc Dự án.</li>
+        <li><b>Luồng:</b> import mô hình 3D (Revit/Navisworks) + bảng tiến độ (<b>Microsoft Project, Oracle Primavera P6</b>) → xuất video mô phỏng hoặc dashboard <b>cảnh báo chậm tiến độ</b>.</li>
+      </ul>
+    </div>
+    <div class="card ac-gold reveal d2">
+      <div class="big-ic"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+      <h3>4 · Bóc tách khối lượng &amp; chi phí (5D BIM)</h3>
+      <p>Tự động hóa việc đo bóc và áp đơn giá.</p>
+      <ul>
+        <li><b>Cubicost (Glodon):</b> rất mạnh ở thị trường Châu Á, tích hợp sẵn <b>tiêu chuẩn đo bóc của Việt Nam</b>.</li>
+        <li><b>CostX (Exactal/RIB):</b> cực kỳ linh hoạt — bóc tách từ cả bản vẽ <b>2D PDF</b> lẫn mô hình <b>3D BIM</b>.</li>
+        <li><b>Người dùng:</b> Kỹ sư Kinh tế Xây dựng (QS), Chuyên viên Dự toán (Cost Estimator).</li>
+        <li><b>Luồng:</b> đọc thuộc tính từ file BIM gốc hoặc .ifc → liên kết CSDL vật giá (Excel/SQL) → xuất bảng <b>BOQ</b> (Bill of Quantities).</li>
+      </ul>
+    </div>
+    <div class="card ac-green reveal d3">
+      <div class="big-ic"><i class="fa-solid fa-leaf"></i></div>
+      <h3>5 · Phân tích năng lượng &amp; bền vững (6D BIM)</h3>
+      <p>Dùng dữ liệu BIM mô phỏng hiệu năng, xin chứng chỉ xanh (LEED, LOTUS, ESG).</p>
+      <ul>
+        <li><b>IES VE:</b> công cụ mô phỏng năng lượng toàn diện nhất; <b>Ladybug/Honeybee</b> (chạy trên Rhino); <b>Autodesk Insight</b>.</li>
+        <li><b>Người dùng:</b> Chuyên gia Năng lượng, Tư vấn Công trình Xanh.</li>
+        <li><b>Luồng:</b> đọc hình học vỏ bao che từ file BIM (thường qua định dạng <b>.gbXML</b>) → tính hướng nắng, hướng gió, cách nhiệt → báo cáo <b>phát thải Carbon</b>.</li>
+      </ul>
+    </div>
+    <div class="card ac-pink reveal">
+      <div class="big-ic"><i class="fa-solid fa-clone"></i></div>
+      <h3>6 · Vận hành &amp; Bản sao số (7D BIM / Digital Twin)</h3>
+      <p>Quản lý vòng đời công trình sau khi bàn giao (Facility Management).</p>
+      <ul>
+        <li><b>Autodesk Tandem · Dalux FM · EcoDomus.</b></li>
+        <li><b>Người dùng:</b> Ban quản lý Tòa nhà / Nhà máy (Facility Manager), Kỹ sư Bảo trì.</li>
+        <li><b>Luồng:</b> nhận Mô hình hoàn công (As-built) chứa dữ liệu <b>COBie</b> → kết nối cảm biến <b>IoT</b> thực tế qua API → báo động khi thiết bị hỏng hóc.</li>
+      </ul>
+    </div>
+    <div class="card ac-cyan reveal d1">
+      <div class="big-ic"><i class="fa-solid fa-cloud"></i></div>
+      <h3>7 · Môi trường dữ liệu chung (CDE) &amp; Kỹ thuật dữ liệu</h3>
+      <p><b>Trái tim của toàn bộ quy trình</b> — nơi mọi con người và phần mềm giao tiếp với nhau.</p>
+      <ul>
+        <li><b>CDE top đầu:</b> Autodesk Construction Cloud (chuẩn mực dân dụng) · Bentley ProjectWise ("vua" hạ tầng lớn).</li>
+        <li><b>Speckle (mã nguồn mở):</b> mệnh danh <b>"GitHub của dân 3D"</b> — bóc mô hình BIM thành các <b>Data Streams</b> thay vì file, đẩy thẳng vào cơ sở dữ liệu.</li>
+        <li><b>Autodesk Platform Services (APS):</b> nền tảng API mạnh nhất để tự code dashboard web kết nối <b>MySQL và Power BI</b>.</li>
+        <li><b>Người dùng:</b> Giám đốc BIM (BIM Manager), Giám đốc Dữ liệu (CDO), Lập trình viên hệ thống (Data Engineer).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="reveal" style="font-size:20px;margin:38px 0 8px"><i class="fa-solid fa-link" style="color:var(--gold);margin-right:8px"></i>Tổng kết luồng dữ liệu — The Golden Thread</h3>
+  <p class="reveal d1" style="color:var(--muted);font-size:14.5px;margin-bottom:20px">Cách các phần mềm này "nói chuyện" với nhau dựa trên <b style="color:var(--text)">3 tiêu chuẩn giao tiếp chính</b>:</p>
+  <div class="grid g3">
+    <div class="card ac-orange reveal">
+      <div class="big-ic"><i class="fa-solid fa-lock"></i></div>
+      <h3>Giao tiếp Native (Độc quyền)</h3>
+      <p><b>Revit → Navisworks:</b> rất mượt nhưng bị <b>khóa trong hệ sinh thái Autodesk</b>.</p>
+    </div>
+    <div class="card ac-cyan reveal d1">
+      <div class="big-ic"><i class="fa-solid fa-globe"></i></div>
+      <h3>Giao tiếp OpenBIM (Chuẩn Quốc tế)</h3>
+      <p>Xuất định dạng <b>.IFC</b> (truyền hình học 3D) và <b>.BCF</b> (truyền tọa độ lỗi va chạm) — giúp <b>Tekla, Revit, Archicad</b> làm việc được với nhau.</p>
+    </div>
+    <div class="card ac-gold reveal d2">
+      <div class="big-ic"><i class="fa-solid fa-database"></i></div>
+      <h3>Giao tiếp API / Database</h3>
+      <p>Dùng <b>Python / Node.js</b> gọi API từ CDE để rút thẳng dữ liệu thô (JSON) đổ vào <b>MySQL → Power BI</b> — đẳng cấp cao nhất của <b style="color:var(--cyan)">Data-Driven Construction</b>.</p>
+    </div>
   </div>
 </section>
 
@@ -1473,133 +1600,6 @@ footer{margin-left:288px;padding:44px clamp(20px,4vw,64px);border-top:1px solid 
   </div>
   <div class="card ac-cyan reveal d2" style="margin-top:20px">
     <p><i class="fa-solid fa-circle-info" style="color:var(--cyan);margin-right:8px"></i><b>Tóm lại:</b> Revit, IFC, Navisworks là công cụ và định dạng <b>tạo ra và chuyển tải</b> dữ liệu hình học 3D. <b>CDE (như ACC)</b> là kho tập trung các <i>file</i> đó, còn <b>MySQL</b> là kho tập trung các <i>dữ liệu số</i> bóc tách từ file để phục vụ quản trị thông minh (Business Intelligence).</p>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ============ 8B. HỆ SINH THÁI PHẦN MỀM BIM ============ -->
-<section id="he-sinh-thai">
-  <span class="kicker reveal"><span class="dot"></span> Phần 08+ · Software Ecosystem</span>
-  <h2 class="sec-title reveal">Hệ sinh thái phần mềm BIM <span class="grad">toàn diện &amp; tiên tiến nhất</span></h2>
-  <p class="sec-sub reveal d1">Báo cáo phân tích <b style="color:var(--text)">công cụ, người dùng và luồng tương tác dữ liệu</b> trong vòng đời dự án xây dựng — 7 nhóm phần mềm ứng với từng mắt xích của quy trình BIM.</p>
-
-  <h3 class="reveal" style="font-size:20px;margin-bottom:8px"><i class="fa-solid fa-pen-ruler" style="color:var(--cyan);margin-right:8px"></i>1 · Nhóm Tạo lập mô hình 3D (BIM Authoring Tools)</h3>
-  <p class="reveal d1" style="color:var(--muted);font-size:14.5px;margin-bottom:20px">Đây là nơi dữ liệu bắt đầu được sinh ra. Các phần mềm này không dùng để "vẽ" mà là để <b style="color:var(--text)">"xây dựng công trình trong môi trường ảo"</b>.</p>
-  <div class="grid g3">
-    <div class="card ac-cyan reveal">
-      <div class="big-ic"><i class="fa-solid fa-compass-drafting"></i></div>
-      <h3>1.1 · Kiến trúc (Architecture)</h3>
-      <div style="margin-bottom:10px"><span class="tag">Autodesk Revit</span><span class="tag">Graphisoft Archicad</span><span class="tag">Rhino + Grasshopper — Parametric</span></div>
-      <ul>
-        <li><b>Người dùng:</b> Kiến trúc sư (Architect), Họa viên BIM (BIM Modeler).</li>
-        <li><b>Vai trò &amp; kết nối:</b> dựng khối, không gian, vỏ bao che. Dữ liệu xuất ra định dạng gốc (<b>.rvt</b>) hoặc file mở <b>.ifc</b> gửi cho Kết cấu và Cơ điện làm hệ quy chiếu.</li>
-      </ul>
-    </div>
-    <div class="card ac-violet reveal d1">
-      <div class="big-ic"><i class="fa-solid fa-cubes"></i></div>
-      <h3>1.2 · Kết cấu (Structure)</h3>
-      <div style="margin-bottom:10px"><span class="tag">Tekla Structures — "vua" thép &amp; đúc sẵn LOD 400</span><span class="tag">Revit Structure — BTCT toàn khối</span></div>
-      <ul>
-        <li><b>Người dùng:</b> Kỹ sư Kết cấu (Structural Engineer), Kỹ sư Detailer (vẽ chi tiết xưởng).</li>
-        <li><b>Vai trò &amp; kết nối:</b> nhận file Kiến trúc làm nền, dựng cột, dầm, sàn, bố trí thép, liên kết bu-lông. Xuất dữ liệu thẳng ra <b>máy CNC</b> tại nhà máy sản xuất (file <b>.nc</b>).</li>
-      </ul>
-    </div>
-    <div class="card ac-orange reveal d2">
-      <div class="big-ic"><i class="fa-solid fa-fan"></i></div>
-      <h3>1.3 · Cơ Điện Nước (MEP)</h3>
-      <div style="margin-bottom:10px"><span class="tag">Autodesk Revit MEP</span><span class="tag">Plugin MagiCAD — thủy lực, thông gió</span></div>
-      <ul>
-        <li><b>Người dùng:</b> Kỹ sư MEP, Kỹ sư PCCC.</li>
-        <li><b>Vai trò &amp; kết nối:</b> nhận file Kiến trúc + Kết cấu làm nền; thiết kế đường ống <b>tránh đâm vào dầm, cột</b> ngay từ khâu thiết kế.</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="grid g2" style="margin-top:30px">
-    <div class="card ac-red reveal">
-      <div class="big-ic"><i class="fa-solid fa-object-group"></i></div>
-      <h3>2 · Phối hợp &amp; Kiểm tra xung đột (BIM Coordination)</h3>
-      <p>Khi các bộ môn làm xong, họ ghép lại với nhau. Nhóm này không dùng để vẽ mà để <b>"đọc, kiểm tra và tìm lỗi"</b>.</p>
-      <ul>
-        <li><b>Navisworks Manage:</b> phổ biến nhất — ghép file cực nhẹ, chạy Clash Detection.</li>
-        <li><b>Solibri Office:</b> tiên tiến nhất về <b>kiểm tra theo quy tắc</b> (Rule-based checking) — tự quét cửa chống cháy có đủ rộng không, bậc thang nào sai quy chuẩn.</li>
-        <li><b>Revizto / BIMcollab:</b> nền tảng <b>theo dõi lỗi</b> (Issue Tracker) — như một mạng xã hội thu nhỏ cho mô hình 3D.</li>
-        <li><b>Người dùng:</b> BIM Coordinator, Design Manager. <b>Luồng:</b> nhận <b>.nwc / .ifc</b> từ Revit/Tekla; tìm thấy lỗi → sinh file <b>.bcf</b> gửi thẳng về Revit của kỹ sư kèm vị trí cần sửa.</li>
-      </ul>
-    </div>
-    <div class="card ac-blue reveal d1">
-      <div class="big-ic"><i class="fa-solid fa-hourglass-half"></i></div>
-      <h3>3 · Quản lý tiến độ thi công (4D BIM)</h3>
-      <p>Gắn không gian 3D với trục thời gian để mô phỏng tòa nhà "mọc lên" như thế nào.</p>
-      <ul>
-        <li><b>Synchro 4D (Bentley):</b> công cụ mạnh nhất hiện nay, vượt trội hơn Navisworks Simulate.</li>
-        <li><b>Người dùng:</b> Kỹ sư Lập kế hoạch (Planning Engineer), Giám đốc Dự án.</li>
-        <li><b>Luồng:</b> import mô hình 3D (Revit/Navisworks) + bảng tiến độ (<b>Microsoft Project, Oracle Primavera P6</b>) → xuất video mô phỏng hoặc dashboard <b>cảnh báo chậm tiến độ</b>.</li>
-      </ul>
-    </div>
-    <div class="card ac-gold reveal d2">
-      <div class="big-ic"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-      <h3>4 · Bóc tách khối lượng &amp; chi phí (5D BIM)</h3>
-      <p>Tự động hóa việc đo bóc và áp đơn giá.</p>
-      <ul>
-        <li><b>Cubicost (Glodon):</b> rất mạnh ở thị trường Châu Á, tích hợp sẵn <b>tiêu chuẩn đo bóc của Việt Nam</b>.</li>
-        <li><b>CostX (Exactal/RIB):</b> cực kỳ linh hoạt — bóc tách từ cả bản vẽ <b>2D PDF</b> lẫn mô hình <b>3D BIM</b>.</li>
-        <li><b>Người dùng:</b> Kỹ sư Kinh tế Xây dựng (QS), Chuyên viên Dự toán (Cost Estimator).</li>
-        <li><b>Luồng:</b> đọc thuộc tính từ file BIM gốc hoặc .ifc → liên kết CSDL vật giá (Excel/SQL) → xuất bảng <b>BOQ</b> (Bill of Quantities).</li>
-      </ul>
-    </div>
-    <div class="card ac-green reveal d3">
-      <div class="big-ic"><i class="fa-solid fa-leaf"></i></div>
-      <h3>5 · Phân tích năng lượng &amp; bền vững (6D BIM)</h3>
-      <p>Dùng dữ liệu BIM mô phỏng hiệu năng, xin chứng chỉ xanh (LEED, LOTUS, ESG).</p>
-      <ul>
-        <li><b>IES VE:</b> công cụ mô phỏng năng lượng toàn diện nhất; <b>Ladybug/Honeybee</b> (chạy trên Rhino); <b>Autodesk Insight</b>.</li>
-        <li><b>Người dùng:</b> Chuyên gia Năng lượng, Tư vấn Công trình Xanh.</li>
-        <li><b>Luồng:</b> đọc hình học vỏ bao che từ file BIM (thường qua định dạng <b>.gbXML</b>) → tính hướng nắng, hướng gió, cách nhiệt → báo cáo <b>phát thải Carbon</b>.</li>
-      </ul>
-    </div>
-    <div class="card ac-pink reveal">
-      <div class="big-ic"><i class="fa-solid fa-clone"></i></div>
-      <h3>6 · Vận hành &amp; Bản sao số (7D BIM / Digital Twin)</h3>
-      <p>Quản lý vòng đời công trình sau khi bàn giao (Facility Management).</p>
-      <ul>
-        <li><b>Autodesk Tandem · Dalux FM · EcoDomus.</b></li>
-        <li><b>Người dùng:</b> Ban quản lý Tòa nhà / Nhà máy (Facility Manager), Kỹ sư Bảo trì.</li>
-        <li><b>Luồng:</b> nhận Mô hình hoàn công (As-built) chứa dữ liệu <b>COBie</b> → kết nối cảm biến <b>IoT</b> thực tế qua API → báo động khi thiết bị hỏng hóc.</li>
-      </ul>
-    </div>
-    <div class="card ac-cyan reveal d1">
-      <div class="big-ic"><i class="fa-solid fa-cloud"></i></div>
-      <h3>7 · Môi trường dữ liệu chung (CDE) &amp; Kỹ thuật dữ liệu</h3>
-      <p><b>Trái tim của toàn bộ quy trình</b> — nơi mọi con người và phần mềm giao tiếp với nhau.</p>
-      <ul>
-        <li><b>CDE top đầu:</b> Autodesk Construction Cloud (chuẩn mực dân dụng) · Bentley ProjectWise ("vua" hạ tầng lớn).</li>
-        <li><b>Speckle (mã nguồn mở):</b> mệnh danh <b>"GitHub của dân 3D"</b> — bóc mô hình BIM thành các <b>Data Streams</b> thay vì file, đẩy thẳng vào cơ sở dữ liệu.</li>
-        <li><b>Autodesk Platform Services (APS):</b> nền tảng API mạnh nhất để tự code dashboard web kết nối <b>MySQL và Power BI</b>.</li>
-        <li><b>Người dùng:</b> Giám đốc BIM (BIM Manager), Giám đốc Dữ liệu (CDO), Lập trình viên hệ thống (Data Engineer).</li>
-      </ul>
-    </div>
-  </div>
-
-  <h3 class="reveal" style="font-size:20px;margin:38px 0 8px"><i class="fa-solid fa-link" style="color:var(--gold);margin-right:8px"></i>Tổng kết luồng dữ liệu — The Golden Thread</h3>
-  <p class="reveal d1" style="color:var(--muted);font-size:14.5px;margin-bottom:20px">Cách các phần mềm này "nói chuyện" với nhau dựa trên <b style="color:var(--text)">3 tiêu chuẩn giao tiếp chính</b>:</p>
-  <div class="grid g3">
-    <div class="card ac-orange reveal">
-      <div class="big-ic"><i class="fa-solid fa-lock"></i></div>
-      <h3>Giao tiếp Native (Độc quyền)</h3>
-      <p><b>Revit → Navisworks:</b> rất mượt nhưng bị <b>khóa trong hệ sinh thái Autodesk</b>.</p>
-    </div>
-    <div class="card ac-cyan reveal d1">
-      <div class="big-ic"><i class="fa-solid fa-globe"></i></div>
-      <h3>Giao tiếp OpenBIM (Chuẩn Quốc tế)</h3>
-      <p>Xuất định dạng <b>.IFC</b> (truyền hình học 3D) và <b>.BCF</b> (truyền tọa độ lỗi va chạm) — giúp <b>Tekla, Revit, Archicad</b> làm việc được với nhau.</p>
-    </div>
-    <div class="card ac-gold reveal d2">
-      <div class="big-ic"><i class="fa-solid fa-database"></i></div>
-      <h3>Giao tiếp API / Database</h3>
-      <p>Dùng <b>Python / Node.js</b> gọi API từ CDE để rút thẳng dữ liệu thô (JSON) đổ vào <b>MySQL → Power BI</b> — đẳng cấp cao nhất của <b style="color:var(--cyan)">Data-Driven Construction</b>.</p>
-    </div>
   </div>
 </section>
 
