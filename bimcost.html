@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Bóc tách Khối lượng & Dự toán 5D BIM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Source Sans 3', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.05)',
+                            200: 'rgba(255, 255, 255, 0.1)',
+                            300: 'rgba(255, 255, 255, 0.15)',
+                        },
+                        surface: '#F5F7F9',
+                        primary: '#0056D2',
+                        accent: '#1FA15F'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F5F7F9;
+            color: #1F1F1F;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+        }
+
+        /* Light academic surfaces */
+        .glass-panel {
+            background: #FFFFFF;
+            border: 1px solid #D6DBDF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid #D6DBDF;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F5F7F9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #C4CCD4; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A9B4BF; }
+
+        /* TreeGrid Styles */
+        .tree-row { transition: background-color 0.15s ease; }
+        .tree-row:hover { background-color: rgba(0,86,210,0.04); }
+        .tree-row.active { background-color: rgba(0,86,210,0.08); border-left: 3px solid #0056D2; }
+
+        /* Indentation for hierarchy */
+        .level-0 .tree-cell-first { padding-left: 1rem; font-weight: 700; color: #0056D2; }
+        .level-1 .tree-cell-first { padding-left: 2.5rem; font-weight: 600; color: #004BB5; }
+        .level-2 .tree-cell-first { padding-left: 4rem; color: #1F1F1F; }
+        .level-3 .tree-cell-first { padding-left: 5.5rem; color: #5C5C5C; font-size: 0.875rem; }
+
+        .expand-btn {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            transition: transform 0.15s ease;
+            margin-right: 6px;
+            color: #8C8C8C;
+        }
+        .expand-btn:hover { color: #0056D2; }
+        .expanded .expand-btn { transform: rotate(90deg); }
+        .leaf-node .expand-btn { opacity: 0; pointer-events: none; }
+
+        /* Inline Input Editing */
+        .edit-input {
+            background: #FFFFFF;
+            border: 1px solid #0056D2;
+            color: #1F1F1F;
+            padding: 2px 6px;
+            border-radius: 4px;
+            width: 110px;
+            text-align: right;
+            outline: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .edit-input:focus { border-color: #0056D2; box-shadow: 0 0 0 2px rgba(0,86,210,0.2); }
+
+        .price-editable { cursor: pointer; border-bottom: 1px dashed #8C8C8C; }
+        .price-editable:hover { color: #0056D2; border-color: #0056D2; }
+
+        .sticky-header th { position: sticky; top: 0; z-index: 10; }
+
+        .sticky-footer td {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.97);
+            border-top: 1px solid #D6DBDF;
+        }
+
+        a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid #0056D2; outline-offset: 2px; }
+
+        /* 3D Highlight Button Animation */
+        @keyframes pulse-btn {
+            0% { box-shadow: 0 0 0 0 rgba(31, 161, 95, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(31, 161, 95, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(31, 161, 95, 0); }
+        }
+        .btn-highlight.active { color: #1FA15F; animation: pulse-btn 1.5s infinite; }
+
+        @media (prefers-reduced-motion: reduce){
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+</style>
+</head>
+<body class="p-4 md:p-6 overflow-hidden">
+
+    <div class="glass-panel w-full h-full rounded-2xl flex flex-col overflow-hidden">
+
+        <!-- Header Bar -->
+        <div class="p-4 border-b border-[#D6DBDF] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#F5F7F9]">
+            <div class="flex items-center gap-4">
+                <a href="index.html" title="Về trang chủ BIM Universe" class="w-10 h-10 rounded-full bg-[#EEF0F2] hover:bg-[#0056D2] border border-[#D6DBDF] flex items-center justify-center text-[#5C5C5C] hover:text-white transition-all shrink-0">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="h-8 w-px bg-[#D6DBDF]"></div>
+                <div>
+                    <h1 class="text-xl font-bold text-[#1F1F1F] flex items-center gap-3">
+                        <i class="fa-solid fa-cube text-[#0056D2]"></i>
+                        Bảng Bóc Tách Khối Lượng 5D (BOQ)
+                    </h1>
+                    <p class="text-xs text-[#5C5C5C] mt-1">Dự án: Chung cư hỗn hợp Tech-Hub Tower — 18 tầng nổi · 2 tầng hầm | Nguồn dữ liệu: BIM MySQL Model V2.4</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="relative w-full sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#5C5C5C] text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm cấu kiện, mã hiệu..." class="w-full bg-white border border-[#D6DBDF] rounded-lg py-2 pl-9 pr-4 text-sm text-[#1F1F1F] placeholder-[#8C8C8C] focus:outline-none focus:border-[#0056D2] transition-colors">
+                </div>
+                <button id="btnExport" class="bg-[#0056D2] hover:bg-[#004BB5] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap shadow">
+                    <i class="fa-solid fa-file-export"></i> Xuất Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div id="filterBar" class="px-4 py-2 border-b border-[#EEF0F2] flex gap-2 overflow-x-auto text-sm">
+            <button data-filter="all" class="filter-btn px-3 py-1.5 rounded bg-[#E3EDFC] text-[#0056D2] border border-[#B9D2F5] font-medium whitespace-nowrap">Tất cả hạng mục</button>
+            <button data-filter="ngam" class="filter-btn px-3 py-1.5 rounded bg-[#F5F7F9] hover:bg-[#E7ECF1] text-[#5C5C5C] border border-transparent whitespace-nowrap transition-colors">Phần Ngầm (Hầm/Móng)</button>
+            <button data-filter="than" class="filter-btn px-3 py-1.5 rounded bg-[#F5F7F9] hover:bg-[#E7ECF1] text-[#5C5C5C] border border-transparent whitespace-nowrap transition-colors">Phần Thân (Cột/Dầm/Sàn)</button>
+            <button data-filter="hoanthien" class="filter-btn px-3 py-1.5 rounded bg-[#F5F7F9] hover:bg-[#E7ECF1] text-[#5C5C5C] border border-transparent whitespace-nowrap transition-colors">Hoàn thiện &amp; Kiến trúc</button>
+            <button data-filter="mep" class="filter-btn px-3 py-1.5 rounded bg-[#F5F7F9] hover:bg-[#E7ECF1] text-[#5C5C5C] border border-transparent whitespace-nowrap transition-colors">MEP (Cơ điện)</button>
+        </div>
+
+        <div class="flex-1 overflow-auto relative" id="tableContainer">
+            <table class="w-full text-left border-collapse min-w-[900px]" id="boqTable">
+                <thead class="glass-header sticky-header text-xs uppercase text-[#5C5C5C] font-semibold tracking-wider">
+                    <tr>
+                        <th class="py-3 px-4 w-1/3">Mã & Hạng mục công việc (WBS)</th>
+                        <th class="py-3 px-4 w-24 text-center">Đơn vị</th>
+                        <th class="py-3 px-4 w-32 text-right">Khối lượng</th>
+                        <th class="py-3 px-4 w-40 text-right">Đơn giá (VNĐ) <i class="fa-solid fa-pen text-[10px] ml-1 text-[#8C8C8C]" title="Có thể chỉnh sửa"></i></th>
+                        <th class="py-3 px-4 w-48 text-right">Thành tiền (VNĐ)</th>
+                        <th class="py-3 px-4 w-20 text-center">3D Sync</th>
+                    </tr>
+                </thead>
+                <tbody id="boqBody" class="text-sm divide-y divide-[#EEF0F2]">
+                    <!-- Javascript sẽ render rows vào đây -->
+                </tbody>
+                <tfoot class="sticky-footer font-bold text-[#1F1F1F] text-base">
+                    <tr>
+                        <td colspan="4" class="py-4 px-4 text-right uppercase tracking-wider text-[#0056D2]">Tổng cộng Dự toán:</td>
+                        <td id="grandTotal" class="py-4 px-4 text-right text-accent font-mono tracking-tight">0</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 1. DỮ LIỆU BIM 5D — Dự án Chung cư hỗn hợp 18 tầng + 2 hầm
+        //    Cấu trúc phân cấp: category → category → group → element
+        //    (Thực tế dữ liệu này được gọi từ API: Node.js → MySQL)
+        // ================================================================
+        const boqData = [
+            // ==================== 1.0 PHẦN NGẦM ====================
+            {
+                id: "NG", wbs: "1.0", name: "Phần Ngầm (Hầm & Móng)", type: "category", filter: "ngam",
+                children: [
+                    {
+                        id: "NG-DAT", wbs: "1.1", name: "Công tác đất", type: "category",
+                        children: [
+                            {
+                                id: "NG-DAT-01", wbs: "1.1.1", name: "Đào đất hố móng & tầng hầm bằng máy", type: "group", unit: "m³", unitPrice: 45000,
+                                children: [
+                                    { id: "201501", name: "Đào đại trà hầm B1 → B2 (sâu 7.2m)", type: "element", unit: "m³", volume: 12800 },
+                                    { id: "201502", name: "Đào cục bộ đài móng lõi thang", type: "element", unit: "m³", volume: 1850 },
+                                    { id: "201503", name: "Đào giằng móng & bể nước ngầm", type: "element", unit: "m³", volume: 620 }
+                                ]
+                            },
+                            {
+                                id: "NG-DAT-02", wbs: "1.1.2", name: "Vận chuyển đất thải đổ đi 10km", type: "group", unit: "m³", unitPrice: 38000,
+                                children: [
+                                    { id: "201510", name: "Đợt 1 — đất đào hầm", type: "element", unit: "m³", volume: 11500 },
+                                    { id: "201511", name: "Đợt 2 — đất đào móng, giằng", type: "element", unit: "m³", volume: 3770 }
+                                ]
+                            },
+                            {
+                                id: "NG-DAT-03", wbs: "1.1.3", name: "Đắp cát tôn nền, đầm chặt K90", type: "group", unit: "m³", unitPrice: 195000,
+                                children: [
+                                    { id: "201520", name: "Cát đệm đáy sàn hầm B2", type: "element", unit: "m³", volume: 780 },
+                                    { id: "201521", name: "Cát lấp rãnh kỹ thuật quanh móng", type: "element", unit: "m³", volume: 370 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "NG-COC", wbs: "1.2", name: "Cọc khoan nhồi", type: "category",
+                        children: [
+                            {
+                                id: "NG-COC-01", wbs: "1.2.1", name: "Cọc khoan nhồi D1000, BT M350", type: "group", unit: "m", unitPrice: 2450000,
+                                children: [
+                                    { id: "210001", name: "Cụm cọc Zone A — 12 cọc × 52m (Trục 1-3)", type: "element", unit: "m", volume: 624 },
+                                    { id: "210002", name: "Cụm cọc Zone B — 14 cọc × 52m (Trục 4-6)", type: "element", unit: "m", volume: 728 },
+                                    { id: "210003", name: "Cụm cọc Zone C — 10 cọc × 52m (Trục 7-8)", type: "element", unit: "m", volume: 520 },
+                                    { id: "210004", name: "Cụm cọc Zone D — 6 cọc × 52m (khối đế TM)", type: "element", unit: "m", volume: 312 }
+                                ]
+                            },
+                            {
+                                id: "NG-COC-02", wbs: "1.2.2", name: "Cọc khoan nhồi D1200 lõi thang, BT M350", type: "group", unit: "m", unitPrice: 3150000,
+                                children: [
+                                    { id: "210010", name: "8 cọc × 55m dưới đài lõi thang máy", type: "element", unit: "m", volume: 440 }
+                                ]
+                            },
+                            {
+                                id: "NG-COC-03", wbs: "1.2.3", name: "Thí nghiệm siêu âm & khoan lõi cọc", type: "group", unit: "cọc", unitPrice: 4500000,
+                                children: [
+                                    { id: "210020", name: "Siêu âm 15 cọc đại diện (30%)", type: "element", unit: "cọc", volume: 15 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "NG-MONG", wbs: "1.3", name: "Đài móng & Giằng móng", type: "category",
+                        children: [
+                            {
+                                id: "NG-MONG-01", wbs: "1.3.1", name: "Bê tông lót đá 4x6 M100, dày 100", type: "group", unit: "m³", unitPrice: 1150000,
+                                children: [
+                                    { id: "220001", name: "Lót đáy đài & giằng toàn mặt bằng", type: "element", unit: "m³", volume: 185 }
+                                ]
+                            },
+                            {
+                                id: "NG-MONG-02", wbs: "1.3.2", name: "Bê tông đài móng M350 (chống thấm B8)", type: "group", unit: "m³", unitPrice: 1780000,
+                                children: [
+                                    { id: "220010", name: "Đài Đ1 — 8 đài 3.0×3.0×1.8m", type: "element", unit: "m³", volume: 385 },
+                                    { id: "220011", name: "Đài Đ2 — 12 đài 2.5×2.5×1.5m", type: "element", unit: "m³", volume: 410 },
+                                    { id: "220012", name: "Đài lõi thang ĐLT 12×9×2.5m", type: "element", unit: "m³", volume: 520 },
+                                    { id: "220013", name: "Hệ giằng móng GM 400×800", type: "element", unit: "m³", volume: 265 }
+                                ]
+                            },
+                            {
+                                id: "NG-MONG-03", wbs: "1.3.3", name: "Cốt thép đài móng CB400-V", type: "group", unit: "tấn", unitPrice: 18500000,
+                                children: [
+                                    { id: "220020", name: "Thép D≤18 đài + giằng", type: "element", unit: "tấn", volume: 82 },
+                                    { id: "220021", name: "Thép D>18 đài + giằng", type: "element", unit: "tấn", volume: 123 }
+                                ]
+                            },
+                            {
+                                id: "NG-MONG-04", wbs: "1.3.4", name: "Ván khuôn đài & giằng móng", type: "group", unit: "m²", unitPrice: 165000,
+                                children: [
+                                    { id: "220030", name: "Ván khuôn thành đài", type: "element", unit: "m²", volume: 1120 },
+                                    { id: "220031", name: "Ván khuôn thành giằng", type: "element", unit: "m²", volume: 530 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "NG-HAM", wbs: "1.4", name: "Kết cấu tầng hầm B1–B2", type: "category",
+                        children: [
+                            {
+                                id: "NG-HAM-01", wbs: "1.4.1", name: "Bê tông sàn hầm M350 (chống thấm B8)", type: "group", unit: "m³", unitPrice: 1820000,
+                                children: [
+                                    { id: "230001", name: "Sàn đáy hầm B2 dày 300", type: "element", unit: "m³", volume: 780 },
+                                    { id: "230002", name: "Sàn hầm B1 dày 200", type: "element", unit: "m³", volume: 520 }
+                                ]
+                            },
+                            {
+                                id: "NG-HAM-02", wbs: "1.4.2", name: "Bê tông vách tầng hầm M350, dày 300", type: "group", unit: "m³", unitPrice: 1890000,
+                                children: [
+                                    { id: "230010", name: "Vách chu vi hầm B2", type: "element", unit: "m³", volume: 356 },
+                                    { id: "230011", name: "Vách chu vi hầm B1", type: "element", unit: "m³", volume: 284 }
+                                ]
+                            },
+                            {
+                                id: "NG-HAM-03", wbs: "1.4.3", name: "Chống thấm màng khò nóng 3mm sàn/vách hầm", type: "group", unit: "m²", unitPrice: 185000,
+                                children: [
+                                    { id: "230020", name: "Chống thấm đáy hầm B2", type: "element", unit: "m²", volume: 2600 },
+                                    { id: "230021", name: "Chống thấm vách hầm (2 mặt ngoài)", type: "element", unit: "m²", volume: 2250 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // ==================== 2.0 PHẦN THÂN ====================
+            {
+                id: "TH", wbs: "2.0", name: "Kết cấu Phần Thân", type: "category", filter: "than",
+                children: [
+                    {
+                        id: "TH-COT", wbs: "2.1", name: "Bê tông Cột & Vách", type: "category",
+                        children: [
+                            {
+                                id: "TH-COT-01", wbs: "2.1.1", name: "Cột–vách M400, tầng 1–5 (khối đế TM)", type: "group", unit: "m³", unitPrice: 1950000,
+                                children: [
+                                    { id: "305101", name: "Cột C1 800×800 — tầng 1 (22 cột)", type: "element", unit: "m³", volume: 112 },
+                                    { id: "305102", name: "Cột C1/C2 — tầng 2 (22 cột)", type: "element", unit: "m³", volume: 98 },
+                                    { id: "305103", name: "Cột C2 700×700 — tầng 3–5", type: "element", unit: "m³", volume: 294 }
+                                ]
+                            },
+                            {
+                                id: "TH-COT-02", wbs: "2.1.2", name: "Cột–vách M350, tầng 6–12 (căn hộ)", type: "group", unit: "m³", unitPrice: 1880000,
+                                children: [
+                                    { id: "305110", name: "Cột C3 600×600 — tầng 6–9", type: "element", unit: "m³", volume: 344 },
+                                    { id: "305111", name: "Cột C3/C4 — tầng 10–12", type: "element", unit: "m³", volume: 258 }
+                                ]
+                            },
+                            {
+                                id: "TH-COT-03", wbs: "2.1.3", name: "Cột–vách M300, tầng 13–18", type: "group", unit: "m³", unitPrice: 1850000,
+                                children: [
+                                    { id: "305120", name: "Cột C4 500×500 — tầng 13–15", type: "element", unit: "m³", volume: 234 },
+                                    { id: "305121", name: "Cột C5 400×400 — tầng 16–18", type: "element", unit: "m³", volume: 234 }
+                                ]
+                            },
+                            {
+                                id: "TH-COT-04", wbs: "2.1.4", name: "Vách lõi thang máy M400, dày 300–400", type: "group", unit: "m³", unitPrice: 2050000,
+                                children: [
+                                    { id: "305130", name: "Lõi CT1 (thang khách) — B2 → mái", type: "element", unit: "m³", volume: 560 },
+                                    { id: "305131", name: "Lõi CT2 (thang hàng + PCCC) — B2 → mái", type: "element", unit: "m³", volume: 330 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "TH-DAM", wbs: "2.2", name: "Bê tông Dầm & Sàn", type: "category",
+                        children: [
+                            {
+                                id: "TH-DAM-01", wbs: "2.2.1", name: "Dầm–sàn tầng điển hình M300, sàn dày 220", type: "group", unit: "m³", unitPrice: 1780000,
+                                children: [
+                                    { id: "306201", name: "Sàn tầng 3–8 (6 sàn × 265 m³)", type: "element", unit: "m³", volume: 1590 },
+                                    { id: "306202", name: "Sàn tầng 9–14 (6 sàn × 265 m³)", type: "element", unit: "m³", volume: 1590 },
+                                    { id: "306203", name: "Sàn tầng 15–18 (4 sàn × 265 m³)", type: "element", unit: "m³", volume: 1060 }
+                                ]
+                            },
+                            {
+                                id: "TH-DAM-02", wbs: "2.2.2", name: "Sàn chuyển tầng 2, M400 dày 1.2m", type: "group", unit: "m³", unitPrice: 2250000,
+                                children: [
+                                    { id: "306210", name: "Sàn chuyển + dầm chuyển DC 1.2×2.0m", type: "element", unit: "m³", volume: 820 }
+                                ]
+                            },
+                            {
+                                id: "TH-DAM-03", wbs: "2.2.3", name: "Sàn mái + sênô, M300 chống thấm B6", type: "group", unit: "m³", unitPrice: 1850000,
+                                children: [
+                                    { id: "306220", name: "Sàn mái & phòng kỹ thuật thang", type: "element", unit: "m³", volume: 310 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "TH-THEP", wbs: "2.3", name: "Cốt thép Phần Thân", type: "category",
+                        children: [
+                            {
+                                id: "TH-THEP-01", wbs: "2.3.1", name: "Cốt thép cột–vách CB400-V", type: "group", unit: "tấn", unitPrice: 18200000,
+                                children: [
+                                    { id: "307001", name: "Thép cột vách tầng 1–9", type: "element", unit: "tấn", volume: 215 },
+                                    { id: "307002", name: "Thép cột vách tầng 10–18 + lõi thang", type: "element", unit: "tấn", volume: 170 }
+                                ]
+                            },
+                            {
+                                id: "TH-THEP-02", wbs: "2.3.2", name: "Cốt thép dầm–sàn CB400-V", type: "group", unit: "tấn", unitPrice: 17800000,
+                                children: [
+                                    { id: "307010", name: "Thép sàn điển hình (16 sàn)", type: "element", unit: "tấn", volume: 545 },
+                                    { id: "307011", name: "Thép sàn chuyển + sàn mái", type: "element", unit: "tấn", volume: 175 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "TH-VK", wbs: "2.4", name: "Ván khuôn & Giàn giáo", type: "category",
+                        children: [
+                            {
+                                id: "TH-VK-01", wbs: "2.4.1", name: "Ván khuôn nhôm cột–vách (luân chuyển)", type: "group", unit: "m²", unitPrice: 145000,
+                                children: [
+                                    { id: "308001", name: "Diện tích tiếp xúc cột vách toàn nhà", type: "element", unit: "m²", volume: 28500 }
+                                ]
+                            },
+                            {
+                                id: "TH-VK-02", wbs: "2.4.2", name: "Ván khuôn sàn hệ ray + cây chống", type: "group", unit: "m²", unitPrice: 135000,
+                                children: [
+                                    { id: "308010", name: "Diện tích sàn 18 tầng + mái", type: "element", unit: "m²", volume: 19800 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // ==================== 3.0 HOÀN THIỆN ====================
+            {
+                id: "HT", wbs: "3.0", name: "Hoàn thiện & Kiến trúc", type: "category", filter: "hoanthien",
+                children: [
+                    {
+                        id: "HT-XAY", wbs: "3.1", name: "Khối xây", type: "category",
+                        children: [
+                            {
+                                id: "HT-XAY-01", wbs: "3.1.1", name: "Xây tường gạch AAC dày 100 (ngăn phòng)", type: "group", unit: "m²", unitPrice: 195000,
+                                children: [
+                                    { id: "401001", name: "Tường ngăn trong căn hộ (252 căn)", type: "element", unit: "m²", volume: 12400 }
+                                ]
+                            },
+                            {
+                                id: "HT-XAY-02", wbs: "3.1.2", name: "Xây tường gạch AAC dày 200 (bao che, ranh căn hộ)", type: "group", unit: "m²", unitPrice: 285000,
+                                children: [
+                                    { id: "401010", name: "Tường bao che chu vi 18 tầng", type: "element", unit: "m²", volume: 11200 },
+                                    { id: "401011", name: "Tường ranh giữa các căn hộ, hành lang", type: "element", unit: "m²", volume: 7400 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "HT-TRAT", wbs: "3.2", name: "Trát & Sơn", type: "category",
+                        children: [
+                            {
+                                id: "HT-TRAT-01", wbs: "3.2.1", name: "Trát tường trong, vữa XM M75 dày 15", type: "group", unit: "m²", unitPrice: 65000,
+                                children: [
+                                    { id: "402001", name: "Trát trong căn hộ + hành lang", type: "element", unit: "m²", volume: 46000 }
+                                ]
+                            },
+                            {
+                                id: "HT-TRAT-02", wbs: "3.2.2", name: "Sơn nước nội thất, 1 lót + 2 phủ", type: "group", unit: "m²", unitPrice: 48000,
+                                children: [
+                                    { id: "402010", name: "Sơn tường + trần toàn bộ căn hộ", type: "element", unit: "m²", volume: 58000 }
+                                ]
+                            },
+                            {
+                                id: "HT-TRAT-03", wbs: "3.2.3", name: "Sơn ngoại thất chống thấm đàn hồi", type: "group", unit: "m²", unitPrice: 85000,
+                                children: [
+                                    { id: "402020", name: "Mặt đứng 4 hướng + lô gia", type: "element", unit: "m²", volume: 9800 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "HT-LAT", wbs: "3.3", name: "Ốp lát", type: "category",
+                        children: [
+                            {
+                                id: "HT-LAT-01", wbs: "3.3.1", name: "Lát gạch granite 600×600 căn hộ + hành lang", type: "group", unit: "m²", unitPrice: 385000,
+                                children: [
+                                    { id: "403001", name: "Sàn căn hộ tầng 3–18", type: "element", unit: "m²", volume: 12100 },
+                                    { id: "403002", name: "Hành lang + sảnh tầng", type: "element", unit: "m²", volume: 2100 }
+                                ]
+                            },
+                            {
+                                id: "HT-LAT-02", wbs: "3.3.2", name: "Ốp gạch men 300×600 khu vệ sinh", type: "group", unit: "m²", unitPrice: 295000,
+                                children: [
+                                    { id: "403010", name: "504 phòng WC (252 căn × 2WC)", type: "element", unit: "m²", volume: 6850 }
+                                ]
+                            },
+                            {
+                                id: "HT-LAT-03", wbs: "3.3.3", name: "Ốp lát đá granite tự nhiên sảnh chính", type: "group", unit: "m²", unitPrice: 1250000,
+                                children: [
+                                    { id: "403020", name: "Sảnh đón tầng trệt + quầy lễ tân", type: "element", unit: "m²", volume: 480 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "HT-CUA", wbs: "3.4", name: "Cửa & Vách kính", type: "category",
+                        children: [
+                            {
+                                id: "HT-CUA-01", wbs: "3.4.1", name: "Cửa đi căn hộ chống cháy 60 phút", type: "group", unit: "bộ", unitPrice: 6500000,
+                                children: [
+                                    { id: "404001", name: "Cửa chính 252 căn hộ", type: "element", unit: "bộ", volume: 252 }
+                                ]
+                            },
+                            {
+                                id: "HT-CUA-02", wbs: "3.4.2", name: "Cửa sổ + vách nhôm kính hệ 55, kính hộp Low-E", type: "group", unit: "m²", unitPrice: 1850000,
+                                children: [
+                                    { id: "404010", name: "Cửa sổ căn hộ 4 mặt đứng", type: "element", unit: "m²", volume: 3400 },
+                                    { id: "404011", name: "Vách kính khối đế thương mại", type: "element", unit: "m²", volume: 900 }
+                                ]
+                            },
+                            {
+                                id: "HT-CUA-03", wbs: "3.4.3", name: "Lan can kính cường lực 12mm ban công", type: "group", unit: "m", unitPrice: 950000,
+                                children: [
+                                    { id: "404020", name: "Ban công + lô gia 252 căn", type: "element", unit: "m", volume: 1240 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "HT-TRAN", wbs: "3.5", name: "Trần thạch cao", type: "category",
+                        children: [
+                            {
+                                id: "HT-TRAN-01", wbs: "3.5.1", name: "Trần thạch cao khung chìm, tấm 9mm", type: "group", unit: "m²", unitPrice: 165000,
+                                children: [
+                                    { id: "405001", name: "Trần phòng khách + ngủ các căn hộ", type: "element", unit: "m²", volume: 12800 }
+                                ]
+                            },
+                            {
+                                id: "HT-TRAN-02", wbs: "3.5.2", name: "Trần thạch cao chịu ẩm khu WC + ban công", type: "group", unit: "m²", unitPrice: 185000,
+                                children: [
+                                    { id: "405010", name: "Trần 504 WC + lô gia", type: "element", unit: "m²", volume: 3200 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // ==================== 4.0 MEP ====================
+            {
+                id: "MEP", wbs: "4.0", name: "Hệ thống Cơ Điện (MEP)", type: "category", filter: "mep",
+                children: [
+                    {
+                        id: "MEP-DIEN", wbs: "4.1", name: "Hệ thống Điện", type: "category",
+                        children: [
+                            {
+                                id: "MEP-DIEN-01", wbs: "4.1.1", name: "Cáp trục chính Cu/XLPE/PVC 4×240mm²", type: "group", unit: "m", unitPrice: 1450000,
+                                children: [
+                                    { id: "701001", name: "Trục cấp nguồn tủ tổng → tủ tầng", type: "element", unit: "m", volume: 850 }
+                                ]
+                            },
+                            {
+                                id: "MEP-DIEN-02", wbs: "4.1.2", name: "Tủ điện phân phối tầng (DB)", type: "group", unit: "tủ", unitPrice: 28500000,
+                                children: [
+                                    { id: "701010", name: "Tủ DB tầng 1–18 + 2 hầm", type: "element", unit: "tủ", volume: 20 }
+                                ]
+                            },
+                            {
+                                id: "MEP-DIEN-03", wbs: "4.1.3", name: "Máng cáp sơn tĩnh điện 300×100", type: "group", unit: "m", unitPrice: 320000,
+                                children: [
+                                    { id: "701020", name: "Máng cáp trục đứng + hành lang", type: "element", unit: "m", volume: 2400 }
+                                ]
+                            },
+                            {
+                                id: "MEP-DIEN-04", wbs: "4.1.4", name: "Đèn LED panel + downlight căn hộ", type: "group", unit: "bộ", unitPrice: 285000,
+                                children: [
+                                    { id: "701030", name: "Chiếu sáng 252 căn hộ", type: "element", unit: "bộ", volume: 3600 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "MEP-NUOC", wbs: "4.2", name: "Hệ thống Cấp thoát nước", type: "category",
+                        children: [
+                            {
+                                id: "MEP-NUOC-01", wbs: "4.2.1", name: "Ống cấp nước PPR PN16 D63 trục đứng", type: "group", unit: "m", unitPrice: 145000,
+                                children: [
+                                    { id: "802001", name: "4 trục đứng cấp nước sinh hoạt", type: "element", unit: "m", volume: 720 }
+                                ]
+                            },
+                            {
+                                id: "MEP-NUOC-02", wbs: "4.2.2", name: "Ống thoát nước uPVC D168", type: "group", unit: "m", unitPrice: 125000,
+                                children: [
+                                    { id: "802010", name: "Trục thoát sinh hoạt + thoát mưa", type: "element", unit: "m", volume: 1650 }
+                                ]
+                            },
+                            {
+                                id: "MEP-NUOC-03", wbs: "4.2.3", name: "Máy bơm chìm nước thải 15HP (Grundfos)", type: "group", unit: "bộ", unitPrice: 68500000,
+                                children: [
+                                    { id: "802020", name: "Trạm bơm hầm B2 (2 chạy + 2 dự phòng)", type: "element", unit: "bộ", volume: 4 }
+                                ]
+                            },
+                            {
+                                id: "MEP-NUOC-04", wbs: "4.2.4", name: "Thiết bị vệ sinh (bàn cầu + lavabo + sen)", type: "group", unit: "bộ", unitPrice: 8500000,
+                                children: [
+                                    { id: "802030", name: "504 phòng WC căn hộ", type: "element", unit: "bộ", volume: 504 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "MEP-HVAC", wbs: "4.3", name: "Hệ thống Thông gió & ĐHKK", type: "category",
+                        children: [
+                            {
+                                id: "MEP-HVAC-01", wbs: "4.3.1", name: "Ống gió tôn tráng kẽm dày 0.75", type: "group", unit: "m²", unitPrice: 320000,
+                                children: [
+                                    { id: "803001", name: "Ống hút khói hành lang 18 tầng", type: "element", unit: "m²", volume: 4200 },
+                                    { id: "803002", name: "Ống cấp gió tươi + hút WC", type: "element", unit: "m²", volume: 2300 }
+                                ]
+                            },
+                            {
+                                id: "MEP-HVAC-02", wbs: "4.3.2", name: "Quạt hút khói trục đứng 25.000 m³/h", type: "group", unit: "bộ", unitPrice: 45000000,
+                                children: [
+                                    { id: "803010", name: "Quạt tăng áp cầu thang + hút khói", type: "element", unit: "bộ", volume: 12 }
+                                ]
+                            },
+                            {
+                                id: "MEP-HVAC-03", wbs: "4.3.3", name: "Điều hòa Multi 2 chiều căn hộ (trọn bộ)", type: "group", unit: "bộ", unitPrice: 32500000,
+                                children: [
+                                    { id: "803020", name: "Hệ Multi cho 252 căn hộ", type: "element", unit: "bộ", volume: 252 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "MEP-PCCC", wbs: "4.4", name: "Hệ thống PCCC", type: "category",
+                        children: [
+                            {
+                                id: "MEP-PCCC-01", wbs: "4.4.1", name: "Ống thép mạ kẽm D114 hệ sprinkler", type: "group", unit: "m", unitPrice: 285000,
+                                children: [
+                                    { id: "804001", name: "Trục đứng + nhánh sprinkler 20 tầng", type: "element", unit: "m", volume: 3850 }
+                                ]
+                            },
+                            {
+                                id: "MEP-PCCC-02", wbs: "4.4.2", name: "Đầu phun sprinkler 68°C", type: "group", unit: "cái", unitPrice: 185000,
+                                children: [
+                                    { id: "804010", name: "Đầu phun căn hộ + hành lang + hầm", type: "element", unit: "cái", volume: 2850 }
+                                ]
+                            },
+                            {
+                                id: "MEP-PCCC-03", wbs: "4.4.3", name: "Tủ trung tâm báo cháy địa chỉ 20 loop", type: "group", unit: "hệ", unitPrice: 385000000,
+                                children: [
+                                    { id: "804020", name: "Tủ trung tâm + đầu báo + còi đèn", type: "element", unit: "hệ", volume: 1 }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: "MEP-THANG", wbs: "4.5", name: "Thang máy", type: "category",
+                        children: [
+                            {
+                                id: "MEP-THANG-01", wbs: "4.5.1", name: "Thang máy khách 1350kg — 20 điểm dừng", type: "group", unit: "thang", unitPrice: 1850000000,
+                                children: [
+                                    { id: "805001", name: "4 thang khách lõi CT1", type: "element", unit: "thang", volume: 4 }
+                                ]
+                            },
+                            {
+                                id: "MEP-THANG-02", wbs: "4.5.2", name: "Thang tải hàng kiêm PCCC 1600kg", type: "group", unit: "thang", unitPrice: 1450000000,
+                                children: [
+                                    { id: "805010", name: "1 thang hàng lõi CT2", type: "element", unit: "thang", volume: 1 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // ================================================================
+        // 2. FORMAT SỐ LIỆU
+        // ================================================================
+        const formatMoney = (amount) => {
+            if (amount === 0 || amount === null || amount === undefined) return "-";
+            return new Intl.NumberFormat('vi-VN').format(Math.round(amount));
+        };
+
+        const formatNum = (num) => {
+            if (num === null || num === undefined) return "";
+            return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+        };
+
+        // ================================================================
+        // 3. ROLLUP — Tính Khối lượng & Thành tiền từ Element lên Category
+        // ================================================================
+        function calculateRollup(nodes) {
+            let totalCost = 0;
+
+            nodes.forEach(node => {
+                if (node.children && node.children.length > 0) {
+                    const childSums = calculateRollup(node.children);
+
+                    if (node.type === 'group') {
+                        node.totalVolume = childSums.volume;
+                        node.totalCost = node.totalVolume * (node.unitPrice || 0);
+                    } else if (node.type === 'category') {
+                        node.totalVolume = null; // Category không cộng khối lượng vì khác đơn vị
+                        node.totalCost = childSums.cost;
+                    }
+                } else if (node.type === 'element') {
+                    node.totalCost = null; // Chỉ hiện thành tiền ở cấp group
+                }
+
+                totalCost += (node.totalCost || 0);
+            });
+
+            const totalVolume = nodes.reduce((sum, n) => sum + (n.volume || n.totalVolume || 0), 0);
+            return { cost: totalCost, volume: totalVolume };
+        }
+
+        // ================================================================
+        // 4. STATE & HELPERS
+        // ================================================================
+        const tbody = document.getElementById('boqBody');
+        const expandedState = {};
+        let activeFilter = 'all';
+        let searchTerm = '';
+
+        function findNode(nodes, id) {
+            for (const n of nodes) {
+                if (n.id === id) return n;
+                if (n.children) {
+                    const found = findNode(n.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function matchesSearch(node) {
+            const t = searchTerm.toLowerCase();
+            return (node.name || '').toLowerCase().includes(t)
+                || String(node.id || '').toLowerCase().includes(t)
+                || String(node.wbs || '').toLowerCase().includes(t);
+        }
+
+        function nodeOrDescendantMatches(node) {
+            if (matchesSearch(node)) return true;
+            return (node.children || []).some(nodeOrDescendantMatches);
+        }
+
+        // ================================================================
+        // 5. RENDER TREE-GRID (Đệ quy)
+        // ================================================================
+        function buildRows(nodes, level, out) {
+            nodes.forEach(node => {
+                if (searchTerm && !nodeOrDescendantMatches(node)) return;
+
+                const isLeaf = !node.children || node.children.length === 0;
+                if (expandedState[node.id] === undefined) expandedState[node.id] = (level < 2);
+                const isExpanded = searchTerm ? true : expandedState[node.id];
+
+                const expandIcon = isLeaf
+                    ? `<span class="inline-block w-4 h-4 ml-1 mr-1 text-[9px] text-[#C4CCD4] text-center"><i class="fa-solid fa-circle"></i></span>`
+                    : `<span class="expand-btn ${isExpanded ? 'expanded' : ''}"><i class="fa-solid fa-chevron-right text-xs"></i></span>`;
+
+                const syncBtn = (node.type === 'element' || node.type === 'group')
+                    ? `<button class="btn-highlight text-[#8C8C8C] hover:text-[#1FA15F] p-1.5 rounded transition-all" onclick="highlight3D('${node.id}', event)" title="Hiển thị trên mô hình 3D"><i class="fa-solid fa-eye"></i></button>`
+                    : '';
+
+                const volumeCell = node.type === 'element' ? formatNum(node.volume)
+                    : node.type === 'group' ? formatNum(node.totalVolume) : '';
+
+                const priceCell = node.type === 'group'
+                    ? `<span class="price-editable" onclick="startEditPrice('${node.id}', event)" title="Click để sửa đơn giá">${formatMoney(node.unitPrice)}</span>`
+                    : '-';
+
+                const costCell = node.totalCost != null ? formatMoney(node.totalCost) : '-';
+                const costClass = node.type === 'category' ? 'text-[#0056D2] font-bold' : 'text-[#1FA15F]';
+                const idBadge = node.type === 'element'
+                    ? `<span class="ml-2 text-[10px] font-mono text-[#8C8C8C] bg-[#F5F7F9] px-1.5 py-0.5 rounded">#${node.id}</span>` : '';
+
+                out.push(`
+                    <tr class="tree-row level-${level} ${node.type === 'category' ? 'bg-[#F5F7F9]' : ''} ${isLeaf ? 'leaf-node' : ''} text-[#1F1F1F]"
+                        ${!isLeaf ? `onclick="toggleRow('${node.id}', event)" style="cursor:pointer"` : ''} data-rowid="${node.id}">
+                        <td class="py-2.5 px-4 tree-cell-first">
+                            <div class="flex items-center">
+                                ${expandIcon}
+                                <span class="font-mono text-xs mr-2 opacity-50 w-12 shrink-0">${node.wbs || ''}</span>
+                                <span>${node.name}</span>
+                                ${idBadge}
+                            </div>
+                        </td>
+                        <td class="py-2.5 px-4 text-center text-[#5C5C5C]">${node.unit || ''}</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-[#5C5C5C]">${volumeCell}</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-[#5C5C5C]">${priceCell}</td>
+                        <td class="py-2.5 px-4 text-right font-mono ${costClass}">${costCell}</td>
+                        <td class="py-2.5 px-4 text-center">${syncBtn}</td>
+                    </tr>`);
+
+                if (!isLeaf && isExpanded) buildRows(node.children, level + 1, out);
+            });
+        }
+
+        function renderTable() {
+            calculateRollup(boqData);
+            const roots = activeFilter === 'all' ? boqData : boqData.filter(c => c.filter === activeFilter);
+            const out = [];
+            buildRows(roots, 0, out);
+            tbody.innerHTML = out.length ? out.join('')
+                : `<tr><td colspan="6" class="py-10 text-center text-[#8C8C8C]"><i class="fa-solid fa-magnifying-glass mr-2"></i>Không tìm thấy hạng mục phù hợp</td></tr>`;
+            const total = roots.reduce((s, c) => s + (c.totalCost || 0), 0);
+            document.getElementById('grandTotal').textContent = formatMoney(total) + ' ₫';
+        }
+
+        // ================================================================
+        // 6. TƯƠNG TÁC — Expand / 3D Sync / Sửa đơn giá
+        // ================================================================
+        function toggleRow(id, event) {
+            if (event) event.stopPropagation();
+            expandedState[id] = !expandedState[id];
+            renderTable();
+        }
+
+        function highlight3D(id, event) {
+            event.stopPropagation();
+            const btn = event.currentTarget;
+            document.querySelectorAll('.btn-highlight.active').forEach(b => { if (b !== btn) b.classList.remove('active'); });
+            btn.classList.toggle('active');
+            btn.closest('tr').classList.toggle('active', btn.classList.contains('active'));
+        }
+
+        function startEditPrice(id, event) {
+            event.stopPropagation();
+            const node = findNode(boqData, id);
+            if (!node) return;
+            const span = event.currentTarget;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'edit-input';
+            input.value = node.unitPrice;
+            span.replaceWith(input);
+            input.focus();
+            input.select();
+
+            const commit = () => {
+                const val = parseFloat(String(input.value).replace(/[^\d.]/g, ''));
+                if (!isNaN(val) && val >= 0) node.unitPrice = val;
+                renderTable();
+            };
+            input.addEventListener('blur', commit);
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') input.blur();
+                if (e.key === 'Escape') { input.removeEventListener('blur', commit); renderTable(); }
+            });
+            input.addEventListener('click', e => e.stopPropagation());
+        }
+
+        // ================================================================
+        // 7. FILTER TABS & SEARCH
+        // ================================================================
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeFilter = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    const on = b === btn;
+                    b.className = 'filter-btn px-3 py-1.5 rounded whitespace-nowrap transition-colors ' + (on
+                        ? 'bg-[#E3EDFC] text-[#0056D2] border border-[#B9D2F5] font-medium'
+                        : 'bg-[#F5F7F9] hover:bg-[#E7ECF1] text-[#5C5C5C] border border-transparent');
+                });
+                renderTable();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', e => {
+            searchTerm = e.target.value.trim();
+            renderTable();
+        });
+
+        // ================================================================
+        // 8. XUẤT EXCEL (CSV có BOM, mở trực tiếp bằng Excel)
+        // ================================================================
+        function walkForExport(nodes, out) {
+            nodes.forEach(node => {
+                out.push([
+                    node.wbs || '', node.type === 'element' ? node.id : '', node.name,
+                    node.unit || '',
+                    node.type === 'element' ? node.volume : (node.totalVolume ?? ''),
+                    node.type === 'group' ? node.unitPrice : '',
+                    node.totalCost ?? ''
+                ]);
+                if (node.children) walkForExport(node.children, out);
+            });
+        }
+
+        document.getElementById('btnExport').addEventListener('click', () => {
+            calculateRollup(boqData);
+            const rows = [['WBS', 'Ma cau kien', 'Hang muc cong viec', 'Don vi', 'Khoi luong', 'Don gia (VND)', 'Thanh tien (VND)']];
+            walkForExport(boqData, rows);
+            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\r\n');
+            const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'BOQ_ChungCu_TechHubTower.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+
+        // ================================================================
+        // 9. KHỞI TẠO
+        // ================================================================
+        renderTable();
+    </script>
+</body>
+</html>

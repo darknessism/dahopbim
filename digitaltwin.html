@@ -6,71 +6,75 @@
     <title>Nền tảng BIM & Digital Twin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background-color: #0f172a; 
-            font-family: 'Inter', sans-serif; 
-            color: #f8fafc;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #F5F7F9;
+            font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+            color: #1F1F1F;
         }
-        #webgl-canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            z-index: 1; 
+        #webgl-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
         }
-        #ui-layer { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 10; 
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
             pointer-events: none; /* Let clicks pass through to canvas */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
         .pointer-events-auto { pointer-events: auto; }
-        
-        /* Glassmorphism Classes */
+
+        /* Light academic surfaces */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #FFFFFF;
+            border: 1px solid #D6DBDF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .glass-button {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
+            background: #F5F7F9;
+            border: 1px solid #D6DBDF;
+            color: #5C5C5C;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-button:hover { background: rgba(59, 130, 246, 0.5); border-color: rgba(96, 165, 250, 0.5); }
-        .glass-button.active { background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        
+        .glass-button:hover { background: rgba(0,86,210,0.08); border-color: #0056D2; color: #0056D2; }
+        .glass-button.active { background: #0056D2; border-color: #0056D2; color: #FFFFFF; }
+
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        ::-webkit-scrollbar-thumb { background: #C4CCD4; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A9B4BF; }
+
+        a:focus-visible, button:focus-visible { outline: 2px solid #0056D2; outline-offset: 2px; }
 
         /* Animations */
         @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(217, 83, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0); }
         }
-        .alert-pulse { animation: pulse-border 2s infinite; border-color: #ef4444; }
-    </style>
+        .alert-pulse { animation: pulse-border 2s infinite; border-color: #D9534F; }
+
+        @media (prefers-reduced-motion: reduce){
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+</style>
 </head>
 <body>
 
@@ -81,32 +85,32 @@
         <!-- Top Bar: Gamification & Global Status -->
         <div class="w-full p-4 flex justify-between items-start pointer-events-auto">
             <div class="glass-panel rounded-xl py-2 px-4 flex items-center gap-4">
-                <a href="index.html" title="Về trang chủ BIM Universe" class="glass-button w-10 h-10 rounded-full flex items-center justify-center text-slate-200 hover:text-white shrink-0">
+                <a href="index.html" title="Về trang chủ BIM Universe" class="glass-button w-10 h-10 rounded-full flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <div class="h-8 w-px bg-white/20"></div>
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-xl font-bold shadow-lg">
+                <div class="h-8 w-px bg-[#D6DBDF]"></div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0056D2] to-[#004BB5] flex items-center justify-center text-xl font-bold text-white shadow-lg">
                     <i class="fa-solid fa-building-user"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight tracking-wide text-white">TECH-HUB TOWER</h1>
-                    <p class="text-xs text-blue-300 font-medium">Khu Công nghiệp Công nghệ cao</p>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide text-[#1F1F1F]">TECH-HUB TOWER</h1>
+                    <p class="text-xs text-[#0056D2] font-medium">Digital Twin · 7D BIM — Facility Management</p>
                 </div>
             </div>
 
             <div class="glass-panel rounded-xl py-2 px-5 flex items-center gap-6">
                 <div class="flex flex-col items-end">
-                    <span class="text-xs text-slate-400">Level Kỹ sư</span>
+                    <span class="text-xs text-[#5C5C5C]">Level Kỹ sư</span>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-amber-400"><i class="fa-solid fa-star text-xs"></i> Lvl 12</span>
+                        <span class="font-bold text-[#B45309]"><i class="fa-solid fa-star text-xs"></i> Lvl 12</span>
                     </div>
                 </div>
-                <div class="h-8 w-px bg-white/20"></div>
+                <div class="h-8 w-px bg-[#D6DBDF]"></div>
                 <div class="flex flex-col items-end">
-                    <span class="text-xs text-slate-400">Điểm thưởng (BIM Coin)</span>
-                    <span class="font-mono font-bold text-emerald-400">2,450 pts</span>
+                    <span class="text-xs text-[#5C5C5C]">Điểm thưởng (BIM Coin)</span>
+                    <span class="font-mono font-bold text-[#1FA15F]">2,450 pts</span>
                 </div>
-                <button class="glass-button w-10 h-10 rounded-full flex items-center justify-center hover:text-blue-300 transition-colors">
+                <button class="glass-button w-10 h-10 rounded-full flex items-center justify-center hover:text-[#0056D2] transition-colors">
                     <i class="fa-solid fa-bell"></i>
                 </button>
             </div>
@@ -116,39 +120,62 @@
             
             <!-- Left Panel: Hierarchy & Visibility Filters -->
             <div class="glass-panel w-72 rounded-2xl flex flex-col pointer-events-auto h-full overflow-hidden transition-transform duration-300">
-                <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
-                    <h2 class="font-semibold text-sm uppercase tracking-wider text-slate-200"><i class="fa-solid fa-layer-group mr-2 text-blue-400"></i> Quản lý Lớp (Layers)</h2>
+                <div class="p-4 border-b border-[#D6DBDF] flex justify-between items-center bg-[#F5F7F9]">
+                    <h2 class="font-semibold text-sm uppercase tracking-wider text-[#1F1F1F]"><i class="fa-solid fa-layer-group mr-2 text-[#0056D2]"></i> Quản lý Lớp (Layers)</h2>
                 </div>
-                <div class="p-4 flex flex-col gap-3 overflow-y-auto">
-                    <!-- Layer Toggle Architecture -->
-                    <label class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                <div class="p-4 flex flex-col gap-2 overflow-y-auto">
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-archway text-slate-400 w-5"></i>
+                            <i class="fa-solid fa-archway text-[#5C5C5C] w-5"></i>
                             <span class="text-sm font-medium">Kiến trúc (Arch)</span>
                         </div>
                         <input type="checkbox" id="toggle-arch" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
                     </label>
-                    
-                    <!-- Layer Toggle Structure -->
-                    <label class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-cubes text-slate-400 w-5"></i>
+                            <i class="fa-solid fa-cubes text-[#5C5C5C] w-5"></i>
                             <span class="text-sm font-medium">Kết cấu (Struct)</span>
                         </div>
                         <input type="checkbox" id="toggle-struct" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
                     </label>
-
-                    <!-- Layer Toggle MEP -->
-                    <label class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 cursor-pointer transition-colors">
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-pipe-valve text-slate-400 w-5"></i>
-                            <span class="text-sm font-medium">Cơ điện (MEP)</span>
+                            <i class="fa-solid fa-fan text-[#C2410C] w-5"></i>
+                            <span class="text-sm font-medium">HVAC &amp; Thông gió</span>
                         </div>
-                        <input type="checkbox" id="toggle-mep" class="w-4 h-4 accent-red-500 cursor-pointer" checked>
+                        <input type="checkbox" id="toggle-hvac" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
+                    </label>
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-faucet-drip text-[#0056D2] w-5"></i>
+                            <span class="text-sm font-medium">Cấp thoát nước</span>
+                        </div>
+                        <input type="checkbox" id="toggle-plumb" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
+                    </label>
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-bolt text-[#B45309] w-5"></i>
+                            <span class="text-sm font-medium">Hệ thống Điện</span>
+                        </div>
+                        <input type="checkbox" id="toggle-elec" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
+                    </label>
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-fire-extinguisher text-[#D9534F] w-5"></i>
+                            <span class="text-sm font-medium">PCCC (Fire)</span>
+                        </div>
+                        <input type="checkbox" id="toggle-fire" class="w-4 h-4 accent-red-500 cursor-pointer" checked>
+                    </label>
+                    <label class="flex items-center justify-between p-2.5 rounded-lg bg-[#F5F7F9] border border-[#EEF0F2] hover:bg-[#E7ECF1] cursor-pointer transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-elevator text-[#334155] w-5"></i>
+                            <span class="text-sm font-medium">Thang máy</span>
+                        </div>
+                        <input type="checkbox" id="toggle-lift" class="w-4 h-4 accent-blue-500 cursor-pointer" checked>
                     </label>
 
-                    <div class="mt-4 pt-4 border-t border-white/10">
-                        <h3 class="text-xs text-slate-400 mb-3 uppercase font-semibold">Công cụ trực quan</h3>
+                    <div class="mt-4 pt-4 border-t border-[#D6DBDF]">
+                        <h3 class="text-xs text-[#5C5C5C] mb-3 uppercase font-semibold">Công cụ trực quan</h3>
                         <div class="grid grid-cols-2 gap-2">
                             <button id="btn-xray" class="glass-button py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-x-ray"></i> Chế độ X-Ray
@@ -162,11 +189,11 @@
             </div>
 
             <div id="property-panel" class="glass-panel w-80 rounded-2xl flex flex-col pointer-events-auto h-full overflow-hidden transition-all duration-300 transform translate-x-full opacity-0">
-                <div class="p-4 border-b border-white/10 bg-gradient-to-r from-blue-900/50 to-transparent flex justify-between items-center">
-                    <h2 class="font-semibold text-sm tracking-wider text-white flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info text-blue-400"></i> Thông tin Cấu kiện
+                <div class="p-4 border-b border-[#D6DBDF] bg-gradient-to-r from-[#E7F0FE] to-transparent flex justify-between items-center">
+                    <h2 class="font-semibold text-sm tracking-wider text-[#1F1F1F] flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-[#0056D2]"></i> Thông tin Cấu kiện
                     </h2>
-                    <button id="btn-close-props" class="text-slate-400 hover:text-white transition-colors">
+                    <button id="btn-close-props" class="text-[#8C8C8C] hover:text-[#0056D2] transition-colors">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -174,65 +201,98 @@
                 <div class="p-5 flex flex-col gap-4 overflow-y-auto">
                     <!-- Identity Data -->
                     <div>
-                        <h3 id="prop-name" class="text-lg font-bold text-white mb-1">Select an object</h3>
-                        <p id="prop-id" class="text-xs font-mono text-slate-400">ID: ---</p>
+                        <h3 id="prop-name" class="text-lg font-bold text-[#1F1F1F] mb-1">Select an object</h3>
+                        <p id="prop-id" class="text-xs font-mono text-[#5C5C5C]">ID: ---</p>
                     </div>
 
                     <!-- BIM Properties -->
-                    <div class="bg-black/20 rounded-xl p-3 border border-white/5">
-                        <h4 class="text-xs text-slate-400 uppercase font-semibold mb-2">Thuộc tính tĩnh (BIM 5D)</h4>
+                    <div class="bg-[#F5F7F9] rounded-xl p-3 border border-[#EEF0F2]">
+                        <h4 class="text-xs text-[#5C5C5C] uppercase font-semibold mb-2">Thuộc tính tĩnh (BIM 5D)</h4>
                         <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-sm">
-                            <div class="text-slate-400">Danh mục:</div>
+                            <div class="text-[#5C5C5C]">Danh mục:</div>
                             <div id="prop-category" class="font-medium text-right truncate">---</div>
                             
-                            <div class="text-slate-400">Vật liệu:</div>
+                            <div class="text-[#5C5C5C]">Vật liệu:</div>
                             <div id="prop-material" class="font-medium text-right truncate">---</div>
                             
-                            <div class="text-slate-400">Tầng:</div>
+                            <div class="text-[#5C5C5C]">Tầng:</div>
                             <div id="prop-level" class="font-medium text-right truncate">---</div>
                             
-                            <div class="text-slate-400">Khối lượng:</div>
-                            <div id="prop-volume" class="font-mono text-blue-300 text-right">---</div>
+                            <div class="text-[#5C5C5C]">Khối lượng:</div>
+                            <div id="prop-volume" class="font-mono text-[#0056D2] text-right">---</div>
                         </div>
                     </div>
 
-                    <div id="iot-panel" class="bg-blue-900/20 rounded-xl p-3 border border-blue-500/30 hidden">
+                    <div id="iot-panel" class="bg-[#EDF4FE] rounded-xl p-3 border border-[#B9D2F5] hidden">
                         <div class="flex justify-between items-center mb-3">
-                            <h4 class="text-xs text-blue-300 uppercase font-semibold flex items-center gap-2">
+                            <h4 class="text-xs text-[#0056D2] uppercase font-semibold flex items-center gap-2">
                                 <span class="relative flex h-2 w-2">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0056D2] opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-[#0056D2]"></span>
                                 </span>
                                 Dữ liệu IoT (Live)
                             </h4>
-                            <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">Cảm biến v2.1</span>
+                            <span class="text-[10px] bg-[#E3EDFC] text-[#0056D2] px-2 py-0.5 rounded border border-[#B9D2F5]">Cảm biến v2.1</span>
                         </div>
                         
                         <div class="flex flex-col gap-3">
                             <div>
                                 <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-slate-300">Nhiệt độ bề mặt</span>
-                                    <span id="iot-temp" class="font-mono font-bold text-amber-400">-- °C</span>
+                                    <span class="text-[#5C5C5C]">Nhiệt độ bề mặt</span>
+                                    <span id="iot-temp" class="font-mono font-bold text-[#B45309]">-- °C</span>
                                 </div>
-                                <div class="w-full bg-black/40 rounded-full h-1.5">
+                                <div class="w-full bg-[#E2E8F0] rounded-full h-1.5">
                                     <div id="iot-temp-bar" class="bg-gradient-to-r from-green-400 to-amber-500 h-1.5 rounded-full" style="width: 50%"></div>
                                 </div>
                             </div>
                             
                             <div>
                                 <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-slate-300">Áp suất đường ống</span>
-                                    <span id="iot-pressure" class="font-mono font-bold text-cyan-400">-- PSI</span>
+                                    <span class="text-[#5C5C5C]">Áp suất đường ống</span>
+                                    <span id="iot-pressure" class="font-mono font-bold text-[#0056D2]">-- PSI</span>
                                 </div>
-                                <div class="w-full bg-black/40 rounded-full h-1.5">
-                                    <div class="bg-cyan-500 h-1.5 rounded-full" style="width: 75%"></div>
+                                <div class="w-full bg-[#E2E8F0] rounded-full h-1.5">
+                                    <div class="bg-[#0056D2] h-1.5 rounded-full" style="width: 75%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- 7D BIM: Asset Record (COBie) -->
+                    <div id="asset-panel" class="bg-[#F5F7F9] rounded-xl p-3 border border-[#EEF0F2] hidden">
+                        <div class="flex justify-between items-center mb-2 gap-2">
+                            <h4 class="text-xs text-[#5C5C5C] uppercase font-semibold flex items-center gap-2">
+                                <i class="fa-solid fa-id-card text-[#0056D2]"></i> Hồ sơ Tài sản — 7D BIM
+                            </h4>
+                            <span class="text-[10px] bg-[#E3EDFC] text-[#0056D2] px-2 py-0.5 rounded border border-[#B9D2F5]">COBie</span>
+                        </div>
+                        <div id="asset-status" class="text-xs font-semibold rounded-lg border px-3 py-2 mb-3 flex items-center gap-2"></div>
+                        <div class="grid grid-cols-2 gap-y-2 gap-x-2 text-sm">
+                            <div class="text-[#5C5C5C]">Hãng sản xuất:</div>
+                            <div id="asset-manu" class="font-medium text-right truncate">---</div>
+                            <div class="text-[#5C5C5C]">Model:</div>
+                            <div id="asset-model" class="font-medium text-right truncate">---</div>
+                            <div class="text-[#5C5C5C]">Số Serial:</div>
+                            <div id="asset-serial" class="font-mono text-xs text-right text-[#0056D2] self-center">---</div>
+                            <div class="text-[#5C5C5C]">Ngày lắp đặt:</div>
+                            <div id="asset-install" class="font-medium text-right">---</div>
+                            <div class="text-[#5C5C5C]">Bảo hành đến:</div>
+                            <div id="asset-warranty" class="font-medium text-right">---</div>
+                            <div class="text-[#5C5C5C]">Chu kỳ bảo trì:</div>
+                            <div id="asset-cycle" class="font-medium text-right">---</div>
+                            <div class="text-[#5C5C5C]">Bảo trì kế tiếp:</div>
+                            <div id="asset-next" class="font-semibold text-right">---</div>
+                            <div class="text-[#5C5C5C]">Nhà cung cấp:</div>
+                            <div id="asset-supplier" class="font-medium text-right truncate text-xs self-center">---</div>
+                            <div class="text-[#5C5C5C]">Tuổi thọ thiết kế:</div>
+                            <div id="asset-life" class="font-medium text-right">---</div>
+                        </div>
+                    </div>
+                    <!-- Tailwind safelist for dynamic status badge colors -->
+                    <span class="hidden text-[#1FA15F] bg-[#E8F6EF] border-[#BFE7D2] text-[#B45309] bg-[#FDF3E7] border-[#F2D9B5] text-[#D9534F] bg-[#FCEDEC] border-[#F3C2C0]"></span>
+
                     <!-- Action Button -->
-                    <button class="w-full mt-2 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl text-sm font-semibold shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
+                    <button class="w-full mt-2 py-3 bg-gradient-to-r from-[#0056D2] to-[#0056D2] hover:from-[#004BB5] hover:to-[#004BB5] rounded-xl text-sm font-semibold text-white shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2">
                         <i class="fa-solid fa-screwdriver-wrench"></i> Tạo Phiếu Bảo Trì (Work Order)
                     </button>
                 </div>
@@ -240,11 +300,15 @@
         </div>
 
         <div class="w-full p-4 pointer-events-auto flex justify-center">
-            <div class="glass-panel rounded-full py-2 px-6 flex items-center gap-6 shadow-2xl">
-                <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Chú giải:</div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-300/30 border border-blue-400"></div><span class="text-xs">Kính (Arch)</span></div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-gray-500"></div><span class="text-xs">Bê tông (Struct)</span></div>
-                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500"></div><span class="text-xs">Ống nước/Bơm (MEP)</span></div>
+            <div class="glass-panel rounded-full py-2 px-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 shadow-2xl">
+                <div class="text-xs font-semibold text-[#5C5C5C] uppercase tracking-widest">Chú giải:</div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#CFE0F7] border border-[#0056D2]"></div><span class="text-xs">Kính (Arch)</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#64748B]"></div><span class="text-xs">Bê tông</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#F68A1E]"></div><span class="text-xs">HVAC</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#0056D2]"></div><span class="text-xs">Cấp thoát nước</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#F5AF02]"></div><span class="text-xs">Điện</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#D9534F]"></div><span class="text-xs">PCCC</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#334155]"></div><span class="text-xs">Thang máy</span></div>
             </div>
         </div>
     </div>
@@ -262,7 +326,11 @@
         const layers = {
             arch: [],
             struct: [],
-            mep: []
+            hvac: [],
+            plumb: [],
+            elec: [],
+            fire: [],
+            lift: []
         };
         
         // Reference to currently selected object
@@ -293,8 +361,8 @@
             // Setup Scene & Camera
             scene = new THREE.Scene();
             // Deep dark blue background to match glassmorphism
-            scene.background = new THREE.Color(0x0a1122); 
-            scene.fog = new THREE.FogExp2(0x0a1122, 0.015);
+            scene.background = new THREE.Color(0xeef2f6); 
+            scene.fog = new THREE.FogExp2(0xeef2f6, 0.015);
 
             camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
             camera.position.set(40, 30, 50);
@@ -319,7 +387,7 @@
             scene.add(buildingGroup);
 
             // Add Ground Grid
-            const gridHelper = new THREE.GridHelper(100, 50, 0x1e293b, 0x1e293b);
+            const gridHelper = new THREE.GridHelper(100, 50, 0xd6dbdf, 0xe7ecf1);
             gridHelper.position.y = -0.1;
             scene.add(gridHelper);
 
@@ -350,7 +418,7 @@
             scene.add(dirLight);
             
             // Add a subtle blue rim light for tech aesthetic
-            const blueLight = new THREE.PointLight(0x3b82f6, 1, 100);
+            const blueLight = new THREE.PointLight(0x0056d2, 1, 100);
             blueLight.position.set(-30, 20, -30);
             scene.add(blueLight);
         }
@@ -432,51 +500,240 @@
             buildingGroup.add(glass);
             layers.arch.push(glass);
 
-            // Generate MEP Pipes (Red HVAC and Blue Water)
-            // Vertical Shafts
-            const pipeVertGeom = new THREE.CylinderGeometry(0.8, 0.8, numFloors * floorHeight, 16);
-            const hvacPipe = new THREE.Mesh(pipeVertGeom, matPipeHVAC);
-            hvacPipe.position.set(12, (numFloors * floorHeight)/2, -7);
-            
-            hvacPipe.userData = {
-                id: `MEP-H-01`, name: `Trục ống hút khói chính`, category: 'HVAC Duct',
-                material: 'Tôn mạ kẽm', level: `Trục kỹ thuật`, volume: '15.4 m³', isIoT: true,
-                sensorTemp: 45, sensorPres: 120
-            };
-            
-            buildingGroup.add(hvacPipe);
-            layers.mep.push(hvacPipe);
+            // ================= MEP & FM SYSTEMS (7D BIM) =================
+            // Materials per system (matching UI legend)
+            const matDuct  = new THREE.MeshStandardMaterial({ color: 0xf68a1e, roughness: 0.5, metalness: 0.3 });
+            const matElec  = new THREE.MeshStandardMaterial({ color: 0xf5af02, roughness: 0.4, metalness: 0.5 });
+            const matFire  = new THREE.MeshStandardMaterial({ color: 0xd9534f, roughness: 0.5, metalness: 0.4 });
+            const matLift  = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.7 });
+            const matShaft = new THREE.MeshStandardMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.3 });
+            const totalH = numFloors * floorHeight;
 
-            // Horizontal Pipes per floor
-            for(let i=1; i<numFloors; i++) {
+            // Helper: register a mesh into scene + layer with BIM data
+            const reg = (mesh, layerKey, data) => {
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.userData = data;
+                buildingGroup.add(mesh);
+                layers[layerKey].push(mesh);
+            };
+
+            // ---------- HVAC & Thông gió ----------
+            const smokeShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, totalH, 16), matDuct);
+            smokeShaft.position.set(12, totalH/2, -7);
+            reg(smokeShaft, 'hvac', {
+                id: 'HVAC-SD-01', name: 'Trục ống hút khói chính', category: 'HVAC — Smoke Duct',
+                material: 'Tôn mạ kẽm 1.2mm', level: 'Trục kỹ thuật', volume: '15.40 m³', isIoT: true,
+                sensorTemp: 45, sensorPres: 120
+            });
+
+            const smokeFan = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.5, 20), matDuct);
+            smokeFan.position.set(12, totalH + 1.25, -7);
+            reg(smokeFan, 'hvac', {
+                id: 'HVAC-FAN-R1', name: 'Quạt hút khói trục đứng 25.000 m³/h', category: 'HVAC — Exhaust Fan',
+                material: 'Thép sơn tĩnh điện', level: 'Mái (Roof)', volume: 'N/A', isIoT: true,
+                sensorTemp: 38, sensorPres: 95,
+                asset: { manu: 'Kruger Ventilation', model: 'FDA 900', serial: 'KRG-77120', install: '12/06/2024',
+                         warranty: '12/06/2027', cycle: '6 tháng/lần', next: '20/09/2026',
+                         supplier: 'Kruger VN — 028 3811 xxxx', life: '15 năm' }
+            });
+
+            const chiller = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 6), matPump);
+            chiller.position.set(0, totalH + 2, 0);
+            reg(chiller, 'hvac', {
+                id: 'HVAC-CH-R1', name: 'Chiller giải nhiệt nước trung tâm', category: 'HVAC — Chiller',
+                material: 'Hợp kim / Ống đồng', level: 'Mái (Roof)', volume: 'N/A', isIoT: true,
+                sensorTemp: 85, sensorPres: 250, // quá nhiệt — mô phỏng cảnh báo
+                asset: { manu: 'Trane', model: 'CVHE 500RT', serial: 'TR-2024-8871', install: '20/03/2024',
+                         warranty: '20/03/2027', cycle: '3 tháng/lần', next: '01/07/2026',
+                         supplier: 'Trane VN — 1800 6789', life: '20 năm' }
+            });
+
+            const ahu = new THREE.Mesh(new THREE.BoxGeometry(5, 2.5, 3), matDuct);
+            ahu.position.set(-9, totalH + 1.75, -5);
+            reg(ahu, 'hvac', {
+                id: 'HVAC-AHU-R1', name: 'AHU xử lý gió tươi tầng mái', category: 'HVAC — Air Handling Unit',
+                material: 'Panel PU cách nhiệt', level: 'Mái (Roof)', volume: 'N/A', isIoT: true,
+                sensorTemp: 32, sensorPres: 90,
+                asset: { manu: 'Daikin', model: 'D-AHU Modular P', serial: 'DK-AH-33019', install: '05/02/2025',
+                         warranty: '05/02/2028', cycle: '3 tháng/lần', next: '05/08/2026',
+                         supplier: 'Daikin VN — 1800 6777', life: '18 năm' }
+            });
+
+            for (let i = 1; i < numFloors; i++) {
+                const fcu = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.9, 1.4), matDuct);
+                fcu.position.set(7, i * floorHeight - 1.6, 6);
+                reg(fcu, 'hvac', {
+                    id: `HVAC-FCU-F${i}`, name: `FCU giấu trần Tầng ${i}`, category: 'HVAC — Fan Coil Unit',
+                    material: 'Tôn sơn tĩnh điện', level: `Tầng ${i}`, volume: 'N/A', isIoT: false,
+                    asset: { manu: 'Daikin', model: 'FWXV-A', serial: `DK-FC-45${i}0`, install: '18/03/2025',
+                             warranty: '18/03/2027', cycle: '3 tháng/lần', next: '10/10/2026',
+                             supplier: 'Daikin VN — 1800 6777', life: '12 năm' }
+                });
+            }
+
+            // ---------- Cấp thoát nước ----------
+            const waterRiser = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, totalH, 16), matPipeWater);
+            waterRiser.position.set(-12, totalH/2, 7);
+            reg(waterRiser, 'plumb', {
+                id: 'PLB-RSR-01', name: 'Trục đứng cấp nước sinh hoạt', category: 'Plumbing — Riser',
+                material: 'Ống PPR PN16 D63', level: 'Trục kỹ thuật', volume: '0.90 m³', isIoT: true,
+                sensorTemp: 24, sensorPres: 72
+            });
+
+            for (let i = 1; i < numFloors; i++) {
                 const pipeHorGeom = new THREE.CylinderGeometry(0.4, 0.4, bWidth - 4, 16);
                 pipeHorGeom.rotateZ(Math.PI / 2);
                 const waterPipe = new THREE.Mesh(pipeHorGeom, matPipeWater);
                 waterPipe.position.set(0, i * floorHeight - 1, 0);
-                
-                waterPipe.userData = {
-                    id: `MEP-W-F${i}`, name: `Ống cấp nước nhánh Tầng ${i}`, category: 'Plumbing',
-                    material: 'Nhựa PPR', level: `Tầng ${i}`, volume: '1.2 m³', isIoT: true,
+                reg(waterPipe, 'plumb', {
+                    id: `PLB-W-F${i}`, name: `Ống cấp nước nhánh Tầng ${i}`, category: 'Plumbing — Branch',
+                    material: 'Nhựa PPR D32', level: `Tầng ${i}`, volume: '1.20 m³', isIoT: true,
                     sensorTemp: 22, sensorPres: 60
-                };
-                
-                buildingGroup.add(waterPipe);
-                layers.mep.push(waterPipe);
+                });
             }
 
-            // Add an IoT Chiller/Pump on Roof
-            const pumpGeom = new THREE.BoxGeometry(4, 3, 6);
-            const pump = new THREE.Mesh(pumpGeom, matPump);
-            pump.position.set(0, numFloors * floorHeight + 1.5, 0);
-            
-            pump.userData = {
-                id: `MEP-PUMP-R1`, name: `Hệ thống Chiller làm mát trung tâm`, category: 'Mechanical Equipment',
-                material: 'Hợp kim', level: `Mái (Roof)`, volume: 'N/A', isIoT: true,
-                sensorTemp: 85, sensorPres: 250 // High temp to simulate alert
-            };
-            
-            buildingGroup.add(pump);
-            layers.mep.push(pump);
+            const tank = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 3, 24), matPipeWater);
+            tank.position.set(9, totalH + 2, 5);
+            reg(tank, 'plumb', {
+                id: 'PLB-TK-R1', name: 'Bể nước mái inox 20 m³', category: 'Plumbing — Water Tank',
+                material: 'Inox SUS304', level: 'Mái (Roof)', volume: '20.00 m³', isIoT: false,
+                asset: { manu: 'Sơn Hà', model: 'SUS304-20000L', serial: 'SH-20K-0092', install: '28/04/2025',
+                         warranty: '28/04/2035', cycle: '6 tháng/lần (vệ sinh bể)', next: '05/12/2026',
+                         supplier: 'Sơn Hà — 1800 6566', life: '30 năm' }
+            });
+
+            [-12.5, -10.3].forEach((x, idx) => {
+                const booster = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 1.2), matPipeWater);
+                booster.position.set(x, 1.1, 4);
+                reg(booster, 'plumb', {
+                    id: `PLB-BP-0${idx+1}`, name: `Bơm tăng áp sinh hoạt số ${idx+1}`, category: 'Plumbing — Booster Pump',
+                    material: 'Gang / Inox', level: 'Tầng 0 (Phòng bơm)', volume: 'N/A', isIoT: idx === 0,
+                    sensorTemp: 36, sensorPres: 82,
+                    asset: { manu: 'Pentax', model: 'CM 50-160', serial: `PX-CM-812${idx}`, install: '02/03/2025',
+                             warranty: '02/03/2027', cycle: '6 tháng/lần', next: '10/09/2026',
+                             supplier: 'Pentax VN — 028 6262 xxxx', life: '12 năm' }
+                });
+            });
+
+            const sewagePump = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.3, 1.5), matPipeWater);
+            sewagePump.position.set(-13, 1.15, -8);
+            reg(sewagePump, 'plumb', {
+                id: 'PLB-SWP-01', name: 'Máy bơm chìm nước thải 15HP', category: 'Plumbing — Sewage Pump',
+                material: 'Gang đúc chống ăn mòn', level: 'Tầng 0 (Hố thu)', volume: 'N/A', isIoT: true,
+                sensorTemp: 42, sensorPres: 65,
+                asset: { manu: 'Grundfos', model: 'SL1.95 — 15HP', serial: '#XYZ123', install: '15/05/2026',
+                         warranty: '15/05/2028', cycle: '6 tháng/lần', next: '15/11/2026',
+                         supplier: 'Grundfos VN — 1900 6355', life: '15 năm' }
+            });
+
+            // ---------- Hệ thống Điện ----------
+            const trayRiser = new THREE.Mesh(new THREE.BoxGeometry(0.7, totalH, 0.35), matElec);
+            trayRiser.position.set(13, totalH/2, 7);
+            reg(trayRiser, 'elec', {
+                id: 'ELE-TR-01', name: 'Thang máng cáp trục đứng 300×100', category: 'Electrical — Cable Tray',
+                material: 'Tôn sơn tĩnh điện', level: 'Trục kỹ thuật', volume: 'N/A', isIoT: false
+            });
+
+            for (let i = 1; i < numFloors; i++) {
+                const tray = new THREE.Mesh(new THREE.BoxGeometry(18, 0.15, 0.5), matElec);
+                tray.position.set(2, i * floorHeight - 0.7, 8.6);
+                reg(tray, 'elec', {
+                    id: `ELE-TRH-F${i}`, name: `Máng cáp hành lang Tầng ${i}`, category: 'Electrical — Cable Tray',
+                    material: 'Tôn mạ kẽm', level: `Tầng ${i}`, volume: 'N/A', isIoT: false
+                });
+            }
+
+            for (let i = 0; i < numFloors; i++) {
+                const db = new THREE.Mesh(new THREE.BoxGeometry(1, 1.7, 0.45), matElec);
+                db.position.set(13.2, i * floorHeight + 1.35, 8.6);
+                reg(db, 'elec', {
+                    id: `ELE-DB-F${i}`, name: `Tủ điện phân phối Tầng ${i} (DB-${i})`, category: 'Electrical — Distribution Board',
+                    material: 'Thép sơn tĩnh điện IP54', level: `Tầng ${i}`, volume: 'N/A', isIoT: false,
+                    asset: { manu: 'ABB', model: 'ArTu K', serial: `ABB-DB-90${i}4`, install: '22/01/2025',
+                             warranty: '22/01/2028', cycle: '12 tháng/lần (đo nhiệt hồng ngoại)', next: '15/03/2027',
+                             supplier: 'ABB VN — 028 7108 xxxx', life: '25 năm' }
+                });
+            }
+
+            const generator = new THREE.Mesh(new THREE.BoxGeometry(4, 2.4, 2), matElec);
+            generator.position.set(22, 1.2, -5);
+            reg(generator, 'elec', {
+                id: 'ELE-GEN-01', name: 'Máy phát điện dự phòng 500kVA', category: 'Electrical — Generator',
+                material: 'Vỏ chống ồn', level: 'Trạm ngoài nhà', volume: 'N/A', isIoT: true,
+                sensorTemp: 28, sensorPres: 8,
+                asset: { manu: 'Cummins', model: 'C500D5', serial: 'CMN-C5-2210', install: '30/11/2024',
+                         warranty: '30/11/2027', cycle: '1 tháng/lần (chạy thử không tải)', next: '30/09/2026',
+                         supplier: 'Cummins VN — 1800 5522', life: '25 năm' }
+            });
+
+            // ---------- PCCC ----------
+            const fireRiser = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, totalH, 16), matFire);
+            fireRiser.position.set(-12, totalH/2, -7);
+            reg(fireRiser, 'fire', {
+                id: 'FIR-RSR-01', name: 'Trục đứng sprinkler D114', category: 'Fire — Sprinkler Riser',
+                material: 'Thép mạ kẽm D114', level: 'Trục kỹ thuật', volume: '0.35 m³', isIoT: true,
+                sensorTemp: 26, sensorPres: 105
+            });
+
+            for (let i = 1; i < numFloors; i++) {
+                const branchGeom = new THREE.CylinderGeometry(0.18, 0.18, bWidth - 8, 12);
+                branchGeom.rotateZ(Math.PI / 2);
+                const branch = new THREE.Mesh(branchGeom, matFire);
+                branch.position.set(0, i * floorHeight - 1.8, -5);
+                reg(branch, 'fire', {
+                    id: `FIR-BR-F${i}`, name: `Nhánh sprinkler Tầng ${i}`, category: 'Fire — Sprinkler Branch',
+                    material: 'Thép mạ kẽm D50', level: `Tầng ${i}`, volume: '0.10 m³', isIoT: false
+                });
+            }
+
+            const firePump = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.5, 1.8), matFire);
+            firePump.position.set(-6, 1.25, -8);
+            reg(firePump, 'fire', {
+                id: 'FIR-PMP-01', name: 'Bơm chữa cháy điện chính', category: 'Fire — Fire Pump',
+                material: 'Gang / Thép', level: 'Tầng 0 (Phòng bơm PCCC)', volume: 'N/A', isIoT: true,
+                sensorTemp: 30, sensorPres: 145,
+                asset: { manu: 'Ebara', model: 'FSA 100×80', serial: 'EBR-FS-5501', install: '14/12/2024',
+                         warranty: '14/12/2027', cycle: '1 tháng/lần (chạy thử theo TCVN)', next: '25/07/2026',
+                         supplier: 'Ebara VN — 028 3822 xxxx', life: '20 năm' }
+            });
+
+            const facp = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.35), matFire);
+            facp.position.set(10, 1.6, 9);
+            reg(facp, 'fire', {
+                id: 'FIR-FACP-01', name: 'Tủ trung tâm báo cháy địa chỉ', category: 'Fire — Alarm Control Panel',
+                material: 'Thép sơn tĩnh điện', level: 'Tầng 0 (Sảnh)', volume: 'N/A', isIoT: false,
+                asset: { manu: 'Hochiki', model: 'FireNET 4127', serial: 'HCK-FN-2288', install: '08/01/2025',
+                         warranty: '08/01/2028', cycle: '3 tháng/lần (test zone)', next: '15/01/2027',
+                         supplier: 'Hochiki VN — 028 5417 xxxx', life: '15 năm' }
+            });
+
+            // ---------- Thang máy ----------
+            const shaft = new THREE.Mesh(new THREE.BoxGeometry(3.4, totalH, 3.4), matShaft);
+            shaft.position.set(-7, totalH/2, 0);
+            reg(shaft, 'lift', {
+                id: 'LIF-SH-01', name: 'Hố thang máy (Shaft)', category: 'Vertical Transport — Shaft',
+                material: 'Bê tông cốt thép M400', level: 'Toàn nhà', volume: '48.00 m³', isIoT: false
+            });
+
+            const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.8, 2.6), matLift);
+            cabin.position.set(-7, 10, 0);
+            reg(cabin, 'lift', {
+                id: 'LIF-EL-01', name: 'Thang máy khách TM-01', category: 'Vertical Transport — Elevator',
+                material: 'Inox gương / Thép', level: 'Cabin (đang ở Tầng 1)', volume: 'N/A', isIoT: true,
+                sensorTemp: 31, sensorPres: 12,
+                asset: { manu: 'KONE', model: 'MonoSpace 700 — 1350kg', serial: 'KN-88123', install: '10/01/2025',
+                         warranty: '10/01/2028', cycle: '1 tháng/lần (theo QCVN 02)', next: '01/08/2026',
+                         supplier: 'KONE VN — 1800 1566', life: '25 năm' }
+            });
+
+            const liftMotor = new THREE.Mesh(new THREE.BoxGeometry(2, 1.4, 1.6), matLift);
+            liftMotor.position.set(-7, totalH + 1.2, 0);
+            reg(liftMotor, 'lift', {
+                id: 'LIF-MC-01', name: 'Máy kéo thang máy (Gearless)', category: 'Vertical Transport — Machine',
+                material: 'Thép / Nam châm vĩnh cửu', level: 'Phòng máy (Mái)', volume: 'N/A', isIoT: true,
+                sensorTemp: 44, sensorPres: 6
+            });
         }
 
         // --- STREAMING_CHUNK: 5. INTERACTION LOGIC (RAYCASTING) ---
@@ -562,9 +819,9 @@
                     
                     // Alert state color change if temp > 80
                     if (rTemp > 80) {
-                        document.getElementById('iot-temp').classList.replace('text-amber-400', 'text-red-500');
+                        document.getElementById('iot-temp').classList.replace('text-[#B45309]', 'text-[#D9534F]');
                     } else {
-                        document.getElementById('iot-temp').classList.replace('text-red-500', 'text-amber-400');
+                        document.getElementById('iot-temp').classList.replace('text-[#D9534F]', 'text-[#B45309]');
                     }
                 };
                 
@@ -573,19 +830,56 @@
             } else {
                 iotPanel.classList.add('hidden');
             }
+
+            // ---- 7D BIM: Hồ sơ tài sản (COBie) & trạng thái bảo trì ----
+            const assetPanel = document.getElementById('asset-panel');
+            if (data.asset) {
+                const a = data.asset;
+                assetPanel.classList.remove('hidden');
+                const set = (id, v) => document.getElementById(id).textContent = v || '---';
+                set('asset-manu', a.manu);
+                set('asset-model', a.model);
+                set('asset-serial', a.serial);
+                set('asset-install', a.install);
+                set('asset-warranty', a.warranty);
+                set('asset-cycle', a.cycle);
+                set('asset-next', a.next);
+                set('asset-supplier', a.supplier);
+                set('asset-life', a.life);
+
+                // Trạng thái bảo trì: so sánh ngày bảo trì kế tiếp với hôm nay
+                const parseVN = s => { const [d, m, y] = s.split('/').map(Number); return new Date(y, m - 1, d); };
+                const days = Math.ceil((parseVN(a.next) - new Date()) / 86400000);
+                const badge = document.getElementById('asset-status');
+                const nextEl = document.getElementById('asset-next');
+                const base = 'text-xs font-semibold rounded-lg border px-3 py-2 mb-3 flex items-center gap-2 ';
+                if (days < 0) {
+                    badge.className = base + 'text-[#D9534F] bg-[#FCEDEC] border-[#F3C2C0]';
+                    badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> QUÁ HẠN BẢO TRÌ ${-days} ngày — cần tạo Work Order`;
+                    nextEl.className = 'font-semibold text-right text-[#D9534F]';
+                } else if (days <= 30) {
+                    badge.className = base + 'text-[#B45309] bg-[#FDF3E7] border-[#F2D9B5]';
+                    badge.innerHTML = `<i class="fa-solid fa-clock"></i> Sắp đến hạn bảo trì — còn ${days} ngày`;
+                    nextEl.className = 'font-semibold text-right text-[#B45309]';
+                } else {
+                    badge.className = base + 'text-[#1FA15F] bg-[#E8F6EF] border-[#BFE7D2]';
+                    badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Vận hành bình thường — bảo trì sau ${days} ngày`;
+                    nextEl.className = 'font-semibold text-right text-[#1FA15F]';
+                }
+            } else {
+                assetPanel.classList.add('hidden');
+            }
         }
 
         // --- STREAMING_CHUNK: 7. UI EVENT LISTENERS ---
         function setupUIEvents() {
-            // Layer Toggles
-            document.getElementById('toggle-arch').addEventListener('change', (e) => {
-                layers.arch.forEach(obj => obj.visible = e.target.checked);
-            });
-            document.getElementById('toggle-struct').addEventListener('change', (e) => {
-                layers.struct.forEach(obj => obj.visible = e.target.checked);
-            });
-            document.getElementById('toggle-mep').addEventListener('change', (e) => {
-                layers.mep.forEach(obj => obj.visible = e.target.checked);
+            // Layer Toggles (7 hệ thống)
+            [['arch','toggle-arch'],['struct','toggle-struct'],['hvac','toggle-hvac'],
+             ['plumb','toggle-plumb'],['elec','toggle-elec'],['fire','toggle-fire'],
+             ['lift','toggle-lift']].forEach(([key, id]) => {
+                document.getElementById(id).addEventListener('change', (e) => {
+                    layers[key].forEach(obj => obj.visible = e.target.checked);
+                });
             });
 
             // Close button on prop panel
